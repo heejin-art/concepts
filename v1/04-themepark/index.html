@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WOO HEE JIN's WONDER PARK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky1:#7fd8ff; --sky2:#bff0ff; --grass:#7ed957; --grass2:#5bc94a;
+    --path:#f3d9a8; --path-edge:#e3bd80;
+    --red:#ff5b6e; --yellow:#ffd23f; --blue:#4dabf7; --pink:#ff8fc8;
+    --purple:#a06bff; --orange:#ff9c43; --teal:#39d3c3;
+    --ink:#3a2a4d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%; overflow:hidden;}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    background:linear-gradient(180deg,var(--sky1),var(--sky2) 60%);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    user-select:none;
+  }
+  .jua{font-family:'Jua',sans-serif;}
+  .bhs{font-family:'Black Han Sans',sans-serif;}
+
+  /* ===================== TICKET / ENTRY ===================== */
+  #entry{
+    position:fixed; inset:0; z-index:60;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,.35), transparent 40%),
+      linear-gradient(160deg,#ff8fc8,#a06bff 55%,#4dabf7);
+    overflow:hidden;
+    transition:opacity .6s ease;
+  }
+  #entry.hide{opacity:0; pointer-events:none;}
+  .gates{position:absolute; inset:0; z-index:1; pointer-events:none;}
+  .gate{
+    position:absolute; top:0; bottom:0; width:50%;
+    background:repeating-linear-gradient(180deg,#ff5b6e 0 60px,#fff 60px 120px);
+    box-shadow:0 0 40px rgba(0,0,0,.25);
+    transition:transform 1s cubic-bezier(.7,0,.3,1);
+  }
+  .gate::after{content:""; position:absolute; top:0; bottom:0; width:14px; background:#ffd23f;}
+  .gate.left{left:0; border-right:6px solid #c2354a;}
+  .gate.left::after{right:0;}
+  .gate.right{right:0; border-left:6px solid #c2354a;}
+  .gate.right::after{left:0;}
+  #entry.open .gate.left{transform:translateX(-100%);}
+  #entry.open .gate.right{transform:translateX(100%);}
+
+  .ticket{
+    position:relative; z-index:3;
+    width:min(440px,90vw);
+    background:#fffdf5;
+    border-radius:22px;
+    padding:34px 30px 30px;
+    text-align:center;
+    box-shadow:0 26px 60px rgba(60,20,90,.45);
+    border:3px dashed #ff9c43;
+    transform:rotate(-2deg);
+    transition:transform .5s, opacity .5s;
+  }
+  #entry.open .ticket{transform:rotate(-2deg) scale(.85) translateY(-20px); opacity:0;}
+  .ticket .perf{
+    position:absolute; top:0; bottom:0; width:18px;
+    background-image:radial-gradient(circle, transparent 5px, #fffdf5 5px);
+    background-size:18px 18px; background-position:center;
+  }
+  .ticket .perf.l{left:-1px;} .ticket .perf.r{right:-1px;}
+  .tk-tag{
+    display:inline-block; background:var(--red); color:#fff;
+    font-family:'Jua'; padding:4px 16px; border-radius:30px; font-size:14px;
+    letter-spacing:1px; box-shadow:0 4px 0 #c2354a; margin-bottom:14px;
+  }
+  .tk-title{font-size:30px; line-height:1.15; color:var(--ink); margin-bottom:6px;}
+  .tk-title b{color:var(--red);}
+  .tk-sub{font-family:'Jua'; color:#a06bff; font-size:18px; margin-bottom:4px;}
+  .tk-role{color:#7a6a8a; font-size:13px; letter-spacing:2px; margin-bottom:18px;}
+  .tk-divider{border:none; border-top:2px dashed #e3bd80; margin:14px 0;}
+  .tk-info{display:flex; justify-content:space-around; font-size:11px; color:#9a8aaa; margin-bottom:18px;}
+  .tk-info b{display:block; font-family:'Jua'; color:var(--ink); font-size:15px;}
+  .enter-btn{
+    font-family:'Jua'; font-size:21px; color:#fff;
+    background:linear-gradient(180deg,#ffd23f,#ff9c43);
+    border:none; border-radius:50px; padding:15px 34px; cursor:pointer;
+    box-shadow:0 7px 0 #d97a1e, 0 12px 24px rgba(217,122,30,.4);
+    transition:transform .12s, box-shadow .12s;
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  .enter-btn:active{transform:translateY(5px); box-shadow:0 2px 0 #d97a1e;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+  .stamp{
+    position:absolute; top:18px; right:18px; width:90px; height:90px;
+    border:4px solid var(--red); color:var(--red); border-radius:50%;
+    font-family:'Black Han Sans'; font-size:13px; line-height:1.1;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    transform:rotate(-18deg) scale(0); opacity:0;
+    transition:transform .35s cubic-bezier(.2,1.6,.4,1), opacity .25s;
+  }
+  .stamp.show{transform:rotate(-18deg) scale(1); opacity:.85;}
+
+  /* ===================== PARK ===================== */
+  #park{position:fixed; inset:0; opacity:0; transition:opacity .8s ease .4s;}
+  #park.show{opacity:1;}
+
+  /* bunting flags */
+  .bunting{position:absolute; top:0; left:0; right:0; height:48px; z-index:30; pointer-events:none;}
+  .bunting svg{width:100%; height:100%;}
+
+  /* HUD legend */
+  .hud{
+    position:absolute; top:60px; left:14px; z-index:25;
+    background:rgba(255,255,255,.92);
+    border:3px solid #ffd23f; border-radius:16px;
+    padding:12px 14px; width:208px;
+    box-shadow:0 8px 22px rgba(60,20,90,.22);
+    backdrop-filter:blur(4px);
+  }
+  .hud h3{font-family:'Black Han Sans'; font-size:16px; color:var(--red); margin-bottom:8px; letter-spacing:.5px;}
+  .hud .legrow{
+    display:flex; align-items:center; gap:8px; font-size:12.5px; padding:4px 6px;
+    border-radius:9px; cursor:pointer; transition:background .15s, transform .12s; font-weight:500;
+  }
+  .hud .legrow:hover{background:#fff3cf; transform:translateX(3px);}
+  .hud .dot{width:16px; height:16px; border-radius:5px; flex:none; display:flex; align-items:center; justify-content:center; font-size:11px;}
+  .hud .tag{margin-left:auto; font-size:10px; color:#fff; padding:1px 7px; border-radius:20px; font-family:'Jua';}
+  .hud .hint{margin-top:9px; font-size:10.5px; color:#8a7a9a; line-height:1.4; text-align:center; border-top:1px dashed #ddd; padding-top:8px;}
+
+  /* map canvas */
+  .map-wrap{position:absolute; inset:0; overflow:hidden;}
+  .map{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 70% 30%, rgba(255,255,255,.25), transparent 50%),
+      linear-gradient(180deg,var(--grass),var(--grass2));
+  }
+  /* decorative grass texture */
+  .map::before{
+    content:""; position:absolute; inset:0; opacity:.18; pointer-events:none;
+    background-image:radial-gradient(#3a8f2c 1.5px, transparent 1.5px);
+    background-size:26px 26px;
+  }
+  /* central plaza paths */
+  .paths{position:absolute; inset:0; pointer-events:none;}
+  .plaza{
+    position:absolute; left:50%; top:54%; transform:translate(-50%,-50%);
+    width:230px; height:230px; border-radius:50%;
+    background:radial-gradient(circle,var(--path),var(--path-edge));
+    border:6px solid #e3bd80;
+  }
+  .road{position:absolute; background:var(--path); border:5px solid var(--path-edge);}
+
+  /* attractions */
+  .attraction{
+    position:absolute; transform:translate(-50%,-50%);
+    z-index:10; cursor:pointer; text-align:center;
+    transition:transform .15s;
+  }
+  .attraction:hover{transform:translate(-50%,-50%) scale(1.06);}
+  .attraction:hover .bldg{filter:brightness(1.07);}
+  .att-label{
+    margin-top:4px; font-family:'Jua'; font-size:13px; color:#fff;
+    background:rgba(58,42,77,.78); padding:2px 9px; border-radius:20px;
+    display:inline-block; white-space:nowrap; box-shadow:0 3px 6px rgba(0,0,0,.2);
+  }
+  .att-label small{font-size:10px; opacity:.85; font-family:'Noto Sans KR';}
+  .bldg{filter:drop-shadow(0 8px 8px rgba(0,0,0,.22)); transition:filter .15s;}
+  .pin{
+    position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    font-size:18px; animation:bob 1.4s ease-in-out infinite;
+  }
+  @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-6px);}}
+
+  /* token (mascot) */
+  .token{
+    position:absolute; z-index:20; width:46px; height:46px;
+    transform:translate(-50%,-100%);
+    transition:left 1.1s cubic-bezier(.45,0,.25,1), top 1.1s cubic-bezier(.45,0,.25,1);
+    pointer-events:none; will-change:left,top;
+  }
+  .token .body{
+    width:46px; height:46px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff,#ffd23f 70%);
+    border:3px solid #ff9c43; display:flex; align-items:center; justify-content:center;
+    font-size:26px; box-shadow:0 5px 10px rgba(0,0,0,.25);
+  }
+  .token.walking .body{animation:hop .35s ease-in-out infinite;}
+  @keyframes hop{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-7px) rotate(4deg);}}
+  .token .shadow{
+    position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
+    width:30px; height:9px; border-radius:50%; background:rgba(0,0,0,.22); filter:blur(1px);
+  }
+
+  /* ferris wheel decoration */
+  .ferris{position:absolute; z-index:8; pointer-events:none;}
+  .ferris .wheel{animation:spin 14s linear infinite; transform-origin:center;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ambient balloons */
+  .balloon{position:absolute; bottom:-90px; z-index:7; pointer-events:none; animation:rise linear infinite;}
+  @keyframes rise{
+    0%{transform:translateY(0) translateX(0) rotate(-4deg); opacity:0;}
+    10%{opacity:1;}
+    90%{opacity:1;}
+    100%{transform:translateY(-118vh) translateX(40px) rotate(4deg); opacity:0;}
+  }
+
+  /* fences */
+  .fence{position:absolute; height:18px; z-index:6; pointer-events:none;
+    background:repeating-linear-gradient(90deg,#fff 0 6px,transparent 6px 22px) ,#fff;
+    background:
+      repeating-linear-gradient(90deg,#ffffff 0 5px, transparent 5px 20px);
+  }
+
+  /* ===================== MODAL ===================== */
+  .overlay{
+    position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+    background:rgba(40,20,60,.5); backdrop-filter:blur(3px);
+    opacity:0; pointer-events:none; transition:opacity .3s;
+  }
+  .overlay.show{opacity:1; pointer-events:auto;}
+  .modal{
+    width:min(480px,92vw); max-height:86vh; overflow:auto;
+    background:#fffdf5; border-radius:24px; padding:0; position:relative;
+    box-shadow:0 30px 70px rgba(40,10,60,.5);
+    transform:translateY(30px) scale(.92); transition:transform .35s cubic-bezier(.2,1.4,.4,1);
+    border:4px solid #fff;
+  }
+  .overlay.show .modal{transform:translateY(0) scale(1);}
+  .m-head{padding:22px 26px 18px; color:#fff; border-radius:20px 20px 0 0; position:relative; overflow:hidden;}
+  .m-head::after{content:"🎪"; position:absolute; right:-6px; bottom:-14px; font-size:80px; opacity:.18;}
+  .m-kicker{font-family:'Jua'; font-size:13px; opacity:.95; letter-spacing:1px;}
+  .m-title{font-family:'Black Han Sans'; font-size:30px; line-height:1.1; margin:2px 0 6px;}
+  .m-badges{display:flex; gap:7px; flex-wrap:wrap;}
+  .m-badge{background:rgba(255,255,255,.28); padding:3px 11px; border-radius:20px; font-size:11.5px; font-weight:700;}
+  .m-body{padding:20px 26px 26px;}
+  .m-desc{font-size:14.5px; line-height:1.65; color:#4a3a5a; margin-bottom:14px;}
+  .m-section{margin-top:14px;}
+  .m-section h4{font-family:'Jua'; font-size:14px; color:var(--purple); margin-bottom:7px;}
+  .chip{display:inline-block; background:#fff3cf; color:#7a5a1a; border:1.5px solid #ffd23f;
+    padding:5px 12px; border-radius:30px; font-size:12.5px; margin:0 6px 6px 0; font-weight:600;}
+  .journey{list-style:none;}
+  .journey li{position:relative; padding:6px 0 6px 26px; font-size:13.5px; color:#4a3a5a; line-height:1.4;}
+  .journey li::before{content:""; position:absolute; left:7px; top:12px; width:9px; height:9px; border-radius:50%; background:var(--red);}
+  .journey li:not(:last-child)::after{content:""; position:absolute; left:11px; top:20px; bottom:-2px; width:2px; background:#ffd6a0;}
+  .journey li b{color:var(--ink); font-family:'Jua';}
+  .journey li.now b{color:var(--red);}
+  .contact-row{display:flex; align-items:center; gap:10px; font-size:14.5px; margin:9px 0; color:#4a3a5a;}
+  .contact-row .ic{width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; flex:none;}
+  .contact-row a{color:var(--blue); text-decoration:none; font-weight:600;}
+  .contact-row a:hover{text-decoration:underline;}
+  .m-close{
+    position:absolute; top:14px; right:14px; z-index:2;
+    width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(255,255,255,.9); color:var(--ink); font-size:18px; font-weight:700;
+    box-shadow:0 3px 8px rgba(0,0,0,.2);
+  }
+  .m-close:hover{background:#fff;}
+
+  /* confetti */
+  #confetti{position:fixed; inset:0; z-index:55; pointer-events:none;}
+
+  /* top banner */
+  .top-banner{
+    position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:28;
+    font-family:'Black Han Sans'; color:#fff; font-size:18px; letter-spacing:1px;
+    text-shadow:0 3px 0 #c2354a, 0 5px 8px rgba(0,0,0,.3); text-align:center; pointer-events:none;
+  }
+  .top-banner small{display:block; font-family:'Jua'; font-size:11px; text-shadow:none; color:#fff; opacity:.95; letter-spacing:2px;}
+
+  @media(max-width:560px){
+    .hud{display:none;}
+    .att-label{font-size:11px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== ENTRY ===================== -->
+<div id="entry">
+  <div class="gates">
+    <div class="gate left"></div>
+    <div class="gate right"></div>
+  </div>
+  <div class="ticket">
+    <span class="perf l"></span><span class="perf r"></span>
+    <div class="stamp" id="stamp">입장<br>완료!</div>
+    <div class="tk-tag">🎟️ ADMIT ONE</div>
+    <h1 class="tk-title jua">WOO HEE JIN's<br><b>WONDER PARK</b></h1>
+    <div class="tk-sub">우희진의 원더파크</div>
+    <div class="tk-role">PRODUCT DESIGNER · PM</div>
+    <hr class="tk-divider" />
+    <div class="tk-info">
+      <div>ATTRACTIONS<b>6</b></div>
+      <div>DATE<b>2026.06.23</b></div>
+      <div>GATE<b>A-01</b></div>
+    </div>
+    <button class="enter-btn" id="enterBtn">입장하기 🎠 티켓 받기</button>
+  </div>
+</div>
+
+<!-- ===================== PARK ===================== -->
+<div id="park">
+  <div class="top-banner jua">🎡 WONDER PARK 🎡<small>클릭해서 놀러가기 · 방향키로 산책</small></div>
+
+  <!-- bunting -->
+  <div class="bunting"><svg id="buntingSvg" viewBox="0 0 1200 48" preserveAspectRatio="none"></svg></div>
+
+  <!-- HUD legend -->
+  <div class="hud">
+    <h3>🗺️ 어트랙션 안내</h3>
+    <div id="legend"></div>
+    <div class="hint">어트랙션을 클릭하면 캐릭터가 걸어가요.<br>방향키(↑↓←→)로 직접 산책도 가능!</div>
+  </div>
+
+  <div class="map-wrap">
+    <div class="map">
+      <div class="paths">
+        <div class="road" id="roadV"></div>
+        <div class="road" id="roadH"></div>
+        <div class="plaza"></div>
+      </div>
+
+      <!-- ferris wheel decoration -->
+      <div class="ferris" id="ferris"></div>
+
+      <!-- attractions injected by JS -->
+      <div id="attractions"></div>
+
+      <!-- token -->
+      <div class="token" id="token">
+        <div class="body" id="tokenBody">🧑‍🎤</div>
+        <div class="shadow"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL ===================== -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <button class="m-close" id="closeBtn" aria-label="닫기">✕</button>
+    <div class="m-head" id="mHead">
+      <div class="m-kicker" id="mKicker"></div>
+      <div class="m-title" id="mTitle"></div>
+      <div class="m-badges" id="mBadges"></div>
+    </div>
+    <div class="m-body" id="mBody"></div>
+  </div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- DATA ---------- */
+  var ATTR = [
+    { id:"notalk", x:26, y:30, color:"var(--pink)", hex:"#ff8fc8",
+      icon:"⛺", shape:"tent", label:"팝업 텐트", labelSub:"NOTALK",
+      kicker:"🎪 팝업 텐트 · NOTALK", title:"노톡 (NOTALK)",
+      badges:["팀 프로젝트","진행중"],
+      desc:"관계의 부담 없이 가볍게 모이는 팝업 커뮤니티. 정해진 시간 동안 잠깐 열렸다 사라지는 '팝업' 형식으로, 깊은 관계 형성에 대한 압박 없이 사람들이 모일 수 있는 공간을 설계했어요.",
+      sections:[{h:"🎯 한 줄 요약", chips:["관계 부담 ↓","팝업 커뮤니티","가볍게 연결"]}] },
+
+    { id:"bbok", x:74, y:28, color:"var(--blue)", hex:"#4dabf7",
+      icon:"🫧", shape:"booth", label:"뽁뽁 부스", labelSub:"오늘뽁",
+      kicker:"🎈 뽁뽁 터뜨리기 부스 · ONEULBBOK", title:"오늘뽁 (ONEULBBOK)",
+      badges:["개인 프로젝트","Google Play 출시 ✅"],
+      desc:"쌓인 스트레스를 뽁뽁이처럼 터뜨려 시원하게 날려버리는 앱. 하루의 답답함을 톡톡 터뜨리는 인터랙션으로 풀어내고, 출시까지 기획·디자인·배포를 직접 진행했어요.",
+      sections:[{h:"📱 출시 정보", chips:["Google Play 정식 출시","스트레스 해소 앱","개인 1인 개발"]}] },
+
+    { id:"kkeu", x:74, y:74, color:"var(--purple)", hex:"#a06bff",
+      icon:"🏋️", shape:"gym", label:"트레이닝 짐", labelSub:"끄숑",
+      kicker:"💪 트레이닝 짐 · KKEUSYONG", title:"끄숑 (KKEUSYONG)",
+      badges:["팀 프로젝트","진행중"],
+      desc:"잔소리하는 디지털 디톡스 트레이너 앱. 스마트폰 과사용을 막아주는 F/T(Focus/Training) 모드를 통해, 친근하지만 따끔한 잔소리로 사용자의 디지털 습관을 코칭해요.",
+      sections:[{h:"🏃 핵심 기능", chips:["F/T 모드","디지털 디톡스","잔소리 트레이너"]}] },
+
+    { id:"about", x:26, y:74, color:"var(--teal)", hex:"#39d3c3",
+      icon:"ℹ️", shape:"info", label:"안내소", labelSub:"ABOUT",
+      kicker:"ℹ️ 안내소 · ABOUT ME", title:"커리어 여정",
+      badges:["Product Designer","PM"],
+      desc:"다양한 산업을 거치며 제품과 사업, 운영을 모두 경험했어요. 디자인 감각과 비즈니스 감각을 함께 갖춘 Product Designer / PM 입니다.",
+      journey:[
+        {t:"한샘", d:"공간/제품 디자인의 기초"},
+        {t:"집닥", d:"인테리어 플랫폼 경험"},
+        {t:"인터스텔라", d:"스타트업 프로덕트"},
+        {t:"미스타교자 사장", d:"직접 사업 운영 · 현장 감각"},
+        {t:"Now — Product Designer / PM", d:"제품을 만들고 키우는 사람", now:true}
+      ] },
+
+    { id:"skills", x:50, y:18, color:"var(--orange)", hex:"#ff9c43",
+      icon:"🎁", shape:"gift", label:"기념품샵", labelSub:"SKILLS",
+      kicker:"🎁 기념품샵 · SKILLS", title:"스킬 셋",
+      badges:["Design","Dev","AI"],
+      desc:"디자인부터 개발, AI 도구까지 — 아이디어를 빠르게 실제 제품으로 만들어내는 풀스택 메이커의 도구함입니다.",
+      sections:[{h:"🎨 디자인 & 개발", chips:["Figma","Next.js","TypeScript","Tailwind","Supabase"]},
+                {h:"🤖 AI 도구", chips:["Claude Code","Midjourney"]}] },
+
+    { id:"contact", x:50, y:88, color:"var(--red)", hex:"#ff5b6e",
+      icon:"📮", shape:"exit", label:"안내데스크", labelSub:"CONTACT",
+      kicker:"📮 출구 / 안내데스크 · CONTACT", title:"연락하기",
+      badges:["언제든 환영!"],
+      desc:"즐거운 관람이었나요? 함께 만들고 싶은 프로젝트가 있다면 편하게 연락 주세요!",
+      contact:[
+        {ic:"✉️", bg:"#ffe3e7", label:"Email", val:"zbxm2000@naver.com", href:"mailto:zbxm2000@naver.com"},
+        {ic:"📞", bg:"#e3f0ff", label:"Phone", val:"010-9966-8132", href:"tel:01099668132"}
+      ] }
+  ];
+
+  /* ---------- BUILD LEGEND ---------- */
+  var legend = document.getElementById("legend");
+  ATTR.forEach(function(a){
+    var row = document.createElement("div");
+    row.className = "legrow";
+    row.innerHTML =
+      '<span class="dot" style="background:'+a.hex+'">'+a.icon+'</span>'+
+      '<span>'+a.label+'</span>'+
+      '<span class="tag" style="background:'+a.hex+'">'+a.labelSub+'</span>';
+    row.addEventListener("click", function(){ walkTo(a); });
+    legend.appendChild(row);
+  });
+
+  /* ---------- BUILD ATTRACTION SHAPES ---------- */
+  function buildingSVG(shape, color){
+    // returns inner svg markup, 90x90 viewport
+    var c = color;
+    switch(shape){
+      case "tent": return '<svg class="bldg" width="92" height="84" viewBox="0 0 92 84">'+
+        '<polygon points="46,4 86,54 6,54" fill="'+c+'"/>'+
+        '<polygon points="46,4 46,54 26,54" fill="#fff" opacity=".35"/>'+
+        '<rect x="6" y="54" width="80" height="26" rx="4" fill="#fff"/>'+
+        '<rect x="14" y="54" width="12" height="26" fill="'+c+'" opacity=".8"/>'+
+        '<rect x="40" y="54" width="12" height="26" fill="'+c+'" opacity=".8"/>'+
+        '<rect x="66" y="54" width="12" height="26" fill="'+c+'" opacity=".8"/>'+
+        '<circle cx="46" cy="4" r="4" fill="#ffd23f"/>'+
+        '<path d="M46 0 L52 -4" stroke="#ffd23f" stroke-width="2"/></svg>';
+      case "booth": return '<svg class="bldg" width="88" height="84" viewBox="0 0 88 84">'+
+        '<rect x="10" y="30" width="68" height="50" rx="8" fill="'+c+'"/>'+
+        '<rect x="10" y="30" width="68" height="14" rx="6" fill="#fff" opacity=".85"/>'+
+        '<polygon points="4,30 44,8 84,30" fill="#ffd23f"/>'+
+        '<circle cx="28" cy="58" r="6" fill="#fff" opacity=".7"/>'+
+        '<circle cx="44" cy="64" r="5" fill="#fff" opacity=".7"/>'+
+        '<circle cx="58" cy="56" r="7" fill="#fff" opacity=".7"/>'+
+        '<circle cx="44" cy="8" r="4" fill="#ff5b6e"/></svg>';
+      case "gym": return '<svg class="bldg" width="92" height="80" viewBox="0 0 92 80">'+
+        '<rect x="8" y="28" width="76" height="48" rx="8" fill="'+c+'"/>'+
+        '<rect x="8" y="28" width="76" height="48" rx="8" fill="#fff" opacity=".08"/>'+
+        '<polygon points="2,28 46,6 90,28" fill="#7d4cd1"/>'+
+        '<rect x="20" y="46" width="10" height="20" rx="3" fill="#fff"/>'+
+        '<rect x="62" y="46" width="10" height="20" rx="3" fill="#fff"/>'+
+        '<rect x="30" y="53" width="32" height="6" rx="3" fill="#fff"/>'+
+        '<text x="46" y="24" font-size="14" text-anchor="middle">🏋️</text></svg>';
+      case "info": return '<svg class="bldg" width="84" height="84" viewBox="0 0 84 84">'+
+        '<rect x="14" y="34" width="56" height="46" rx="10" fill="'+c+'"/>'+
+        '<polygon points="42,8 78,38 6,38" fill="#1fb5a6"/>'+
+        '<circle cx="42" cy="56" r="15" fill="#fff"/>'+
+        '<text x="42" y="62" font-size="20" text-anchor="middle" font-family="Black Han Sans" fill="'+c+'">i</text></svg>';
+      case "gift": return '<svg class="bldg" width="84" height="84" viewBox="0 0 84 84">'+
+        '<rect x="16" y="40" width="52" height="40" rx="6" fill="'+c+'"/>'+
+        '<rect x="12" y="30" width="60" height="14" rx="4" fill="#ff5b6e"/>'+
+        '<rect x="38" y="30" width="8" height="50" fill="#ffd23f"/>'+
+        '<path d="M42 30 C30 18 22 30 42 30 C54 18 62 30 42 30" fill="#ffd23f"/></svg>';
+      case "exit": return '<svg class="bldg" width="92" height="80" viewBox="0 0 92 80">'+
+        '<rect x="10" y="30" width="72" height="48" rx="8" fill="'+c+'"/>'+
+        '<rect x="10" y="30" width="72" height="16" rx="6" fill="#fff" opacity=".25"/>'+
+        '<text x="46" y="44" font-size="13" text-anchor="middle" fill="#fff" font-family="Black Han Sans">INFO</text>'+
+        '<rect x="30" y="52" width="32" height="26" rx="4" fill="#fff" opacity=".85"/>'+
+        '<circle cx="54" cy="65" r="2.5" fill="'+c+'"/></svg>';
+    }
+    return "";
+  }
+
+  var attWrap = document.getElementById("attractions");
+  ATTR.forEach(function(a){
+    var el = document.createElement("div");
+    el.className = "attraction";
+    el.style.left = a.x + "%";
+    el.style.top  = a.y + "%";
+    el.dataset.id = a.id;
+    el.innerHTML =
+      '<div style="position:relative;display:inline-block">'+
+      '<span class="pin">📍</span>'+
+      buildingSVG(a.shape, a.hex)+
+      '</div>'+
+      '<div class="att-label">'+a.label+' <small>'+a.labelSub+'</small></div>';
+    el.addEventListener("click", function(){ walkTo(a); });
+    attWrap.appendChild(el);
+    a._el = el;
+  });
+
+  /* ---------- ROADS (positioned to plaza) ---------- */
+  function layoutRoads(){
+    var rv = document.getElementById("roadV");
+    var rh = document.getElementById("roadH");
+    rv.style.left = "calc(50% - 26px)"; rv.style.top="10%"; rv.style.width="52px"; rv.style.height="80%";
+    rh.style.top = "calc(54% - 26px)"; rh.style.left="8%"; rh.style.height="52px"; rh.style.width="84%";
+  }
+  layoutRoads();
+
+  /* ---------- FERRIS WHEEL ---------- */
+  (function(){
+    var f = document.getElementById("ferris");
+    f.style.right = "5%"; f.style.top = "8%";
+    var spokes = "";
+    for(var i=0;i<8;i++){
+      var ang = i*45;
+      spokes += '<line x1="80" y1="80" x2="'+(80+62*Math.cos(ang*Math.PI/180))+'" y2="'+(80+62*Math.sin(ang*Math.PI/180))+'" stroke="#fff" stroke-width="3"/>';
+      var cx = 80+62*Math.cos(ang*Math.PI/180), cy=80+62*Math.sin(ang*Math.PI/180);
+      var cols=["#ff5b6e","#ffd23f","#4dabf7","#a06bff","#39d3c3","#ff8fc8","#ff9c43","#7ed957"];
+      spokes += '<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="'+cols[i]+'" stroke="#fff" stroke-width="2"/>';
+    }
+    f.innerHTML =
+      '<svg width="160" height="178" viewBox="0 0 160 178">'+
+      '<line x1="80" y1="80" x2="46" y2="170" stroke="#cfae7a" stroke-width="6"/>'+
+      '<line x1="80" y1="80" x2="114" y2="170" stroke="#cfae7a" stroke-width="6"/>'+
+      '<g class="wheel" style="transform-origin:80px 80px">'+
+        '<circle cx="80" cy="80" r="62" fill="none" stroke="#fff" stroke-width="5"/>'+
+        spokes+
+        '<circle cx="80" cy="80" r="8" fill="#ffd23f" stroke="#fff" stroke-width="3"/>'+
+      '</g></svg>';
+  })();
+
+  /* ---------- BUNTING FLAGS ---------- */
+  (function(){
+    var svg = document.getElementById("buntingSvg");
+    var cols=["#ff5b6e","#ffd23f","#4dabf7","#a06bff","#39d3c3","#ff8fc8","#ff9c43"];
+    var n=24, html="";
+    html += '<path d="M0 6 Q600 30 1200 6" stroke="#fff" stroke-width="2" fill="none" opacity=".7"/>';
+    for(var i=0;i<n;i++){
+      var x = i*(1200/n)+8;
+      var sag = 6 + 24*Math.sin(Math.PI*(x/1200)); // follow the rope sag
+      var c = cols[i%cols.length];
+      html += '<polygon points="'+x+','+sag+' '+(x+34)+','+sag+' '+(x+17)+','+(sag+26)+'" fill="'+c+'"/>';
+    }
+    svg.innerHTML = html;
+  })();
+
+  /* ---------- AMBIENT BALLOONS ---------- */
+  (function(){
+    var park = document.getElementById("park");
+    var cols=["#ff5b6e","#ffd23f","#4dabf7","#a06bff","#39d3c3","#ff8fc8"];
+    for(var i=0;i<7;i++){
+      var b = document.createElement("div");
+      b.className = "balloon";
+      var c = cols[i%cols.length];
+      b.style.left = (8 + Math.random()*84) + "%";
+      b.style.animationDuration = (13 + Math.random()*9) + "s";
+      b.style.animationDelay = (-Math.random()*16) + "s";
+      var sz = 26 + Math.random()*16;
+      b.innerHTML = '<svg width="'+sz+'" height="'+(sz*1.5)+'" viewBox="0 0 30 45">'+
+        '<ellipse cx="15" cy="15" rx="13" ry="16" fill="'+c+'"/>'+
+        '<ellipse cx="10" cy="9" rx="4" ry="5" fill="#fff" opacity=".5"/>'+
+        '<polygon points="12,30 18,30 15,34" fill="'+c+'"/>'+
+        '<path d="M15 34 Q19 40 15 45" stroke="#fff" stroke-width="1" fill="none"/></svg>';
+      park.appendChild(b);
+    }
+  })();
+
+  /* ---------- TOKEN MOVEMENT ---------- */
+  var token = document.getElementById("token");
+  var mapWrap = document.querySelector(".map-wrap");
+  var tokenX = 50, tokenY = 54; // percentage
+  var walkTimer = null;
+
+  function setToken(){
+    token.style.left = tokenX + "%";
+    token.style.top  = tokenY + "%";
+  }
+  setToken();
+
+  function walkTo(a){
+    closeModal(); // close any open
+    token.classList.add("walking");
+    // walk roughly toward attraction, stop a bit below it
+    tokenX = a.x;
+    tokenY = a.y + 8;
+    if(tokenY>92) tokenY=92;
+    setToken();
+    if(walkTimer) clearTimeout(walkTimer);
+    walkTimer = setTimeout(function(){
+      token.classList.remove("walking");
+      openModal(a);
+    }, 1150);
+  }
+
+  /* arrow key movement */
+  document.addEventListener("keydown", function(e){
+    if(document.getElementById("overlay").classList.contains("show")){
+      if(e.key==="Escape") closeModal();
+      return;
+    }
+    if(document.getElementById("park").classList.contains("show")===false) return;
+    var step = 4, moved=false;
+    if(e.key==="ArrowUp"){ tokenY=Math.max(8,tokenY-step); moved=true;}
+    else if(e.key==="ArrowDown"){ tokenY=Math.min(94,tokenY+step); moved=true;}
+    else if(e.key==="ArrowLeft"){ tokenX=Math.max(4,tokenX-step); moved=true;}
+    else if(e.key==="ArrowRight"){ tokenX=Math.min(96,tokenX+step); moved=true;}
+    if(moved){
+      e.preventDefault();
+      token.classList.add("walking");
+      setToken();
+      clearTimeout(walkTimer);
+      walkTimer = setTimeout(function(){
+        token.classList.remove("walking");
+        checkNearby();
+      }, 360);
+    }
+  });
+
+  function checkNearby(){
+    for(var i=0;i<ATTR.length;i++){
+      var a = ATTR[i];
+      var dx = a.x - tokenX, dy = (a.y+8) - tokenY;
+      if(Math.sqrt(dx*dx+dy*dy) < 7){ openModal(a); return; }
+    }
+  }
+
+  /* ---------- MODAL ---------- */
+  var overlay = document.getElementById("overlay");
+  function openModal(a){
+    document.getElementById("mHead").style.background = "linear-gradient(135deg,"+a.hex+", "+a.hex+"cc)";
+    document.getElementById("mKicker").textContent = a.kicker;
+    document.getElementById("mTitle").textContent = a.title;
+    var badges = document.getElementById("mBadges");
+    badges.innerHTML = "";
+    (a.badges||[]).forEach(function(b){
+      var s=document.createElement("span"); s.className="m-badge"; s.textContent=b; badges.appendChild(s);
+    });
+    var body = document.getElementById("mBody");
+    var html = '<p class="m-desc">'+a.desc+'</p>';
+    if(a.sections){
+      a.sections.forEach(function(sec){
+        html += '<div class="m-section"><h4>'+sec.h+'</h4>';
+        sec.chips.forEach(function(ch){ html+='<span class="chip">'+ch+'</span>'; });
+        html += '</div>';
+      });
+    }
+    if(a.journey){
+      html += '<div class="m-section"><h4>🚩 커리어 여정</h4><ul class="journey">';
+      a.journey.forEach(function(j){
+        html += '<li'+(j.now?' class="now"':'')+'><b>'+j.t+'</b> — '+j.d+'</li>';
+      });
+      html += '</ul></div>';
+    }
+    if(a.contact){
+      html += '<div class="m-section">';
+      a.contact.forEach(function(c){
+        html += '<div class="contact-row"><span class="ic" style="background:'+c.bg+'">'+c.ic+'</span>'+
+                '<span><span style="font-size:11px;color:#9a8aaa;display:block">'+c.label+'</span>'+
+                '<a href="'+c.href+'">'+c.val+'</a></span></div>';
+      });
+      html += '</div>';
+    }
+    body.innerHTML = html;
+    overlay.classList.add("show");
+    burstConfetti();
+  }
+  function closeModal(){ overlay.classList.remove("show"); }
+  document.getElementById("closeBtn").addEventListener("click", closeModal);
+  overlay.addEventListener("click", function(e){ if(e.target===overlay) closeModal(); });
+
+  /* ---------- CONFETTI ---------- */
+  var cv = document.getElementById("confetti");
+  var ctx = cv.getContext("2d");
+  var parts = [];
+  function resize(){ cv.width=window.innerWidth; cv.height=window.innerHeight; }
+  resize(); window.addEventListener("resize", resize);
+  var cols=["#ff5b6e","#ffd23f","#4dabf7","#a06bff","#39d3c3","#ff8fc8","#ff9c43","#7ed957"];
+  function burstConfetti(){
+    var cx = cv.width/2, cy = cv.height/2;
+    for(var i=0;i<120;i++){
+      var ang = Math.random()*Math.PI*2;
+      var sp = 4 + Math.random()*9;
+      parts.push({
+        x:cx, y:cy,
+        vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp - 4,
+        g:0.18+Math.random()*0.12,
+        size:5+Math.random()*7,
+        rot:Math.random()*6.28, vr:(Math.random()-.5)*.4,
+        col:cols[(Math.random()*cols.length)|0],
+        life:90+Math.random()*40, shape:Math.random()<.5?0:1
+      });
+    }
+    if(!rafOn){ rafOn=true; requestAnimationFrame(loop); }
+  }
+  var rafOn=false;
+  function loop(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    for(var i=parts.length-1;i>=0;i--){
+      var p=parts[i];
+      p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life--;
+      if(p.life<=0 || p.y>cv.height+40){ parts.splice(i,1); continue; }
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.col; ctx.globalAlpha=Math.min(1,p.life/30);
+      if(p.shape===0){ ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*.6); }
+      else { ctx.beginPath(); ctx.arc(0,0,p.size/2,0,6.28); ctx.fill(); }
+      ctx.restore();
+    }
+    if(parts.length>0){ requestAnimationFrame(loop); } else { rafOn=false; }
+  }
+
+  /* ---------- ENTRY → PARK ---------- */
+  var entry = document.getElementById("entry");
+  var park = document.getElementById("park");
+  document.getElementById("enterBtn").addEventListener("click", function(){
+    document.getElementById("stamp").classList.add("show");
+    setTimeout(function(){ entry.classList.add("open"); }, 380);
+    setTimeout(function(){
+      entry.classList.add("hide");
+      park.classList.add("show");
+      // welcome confetti
+      setTimeout(burstConfetti, 300);
+    }, 1100);
+    setTimeout(function(){ entry.style.display="none"; }, 1900);
+  });
+
+})();
+</script>
+</body>
+</html>

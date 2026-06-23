@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WOO HEE JIN 의 이야기 · 팝업 동화책</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --cream:#f6ecd6;
+    --cream2:#efe1c2;
+    --paper-edge:#e3d2ac;
+    --ink:#5a4632;
+    --ink-soft:#7c6750;
+    --rose:#d98b7a;
+    --sky:#9fc3c9;
+    --leaf:#8aa872;
+    --gold:#d9a441;
+    --plum:#9d7b8b;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{ height:100%; }
+
+  body{
+    font-family:'Gowun Batang', serif;
+    color:var(--ink);
+    overflow:hidden;
+    background:
+      radial-gradient(1200px 800px at 30% 20%, #3a4a55 0%, #2b3640 55%, #20272e 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    perspective:2600px;
+  }
+
+  /* soft floating watercolor blobs in the dark room */
+  .room-blob{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(60px);
+    opacity:.35;
+    pointer-events:none;
+    z-index:0;
+    animation:drift 18s ease-in-out infinite;
+  }
+  .room-blob.b1{ width:420px;height:420px; top:-80px; left:-60px; background:#5b6e74; }
+  .room-blob.b2{ width:380px;height:380px; bottom:-100px; right:-40px; background:#6b5566; animation-delay:-6s; }
+  .room-blob.b3{ width:300px;height:300px; bottom:10%; left:8%; background:#4d6357; animation-delay:-11s; }
+  @keyframes drift{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(30px,-20px) scale(1.08); }
+  }
+
+  /* ---------- BOOK ---------- */
+  .stage{
+    position:relative;
+    z-index:2;
+    transform-style:preserve-3d;
+  }
+
+  .book{
+    position:relative;
+    width:min(94vw, 980px);
+    height:min(82vh, 640px);
+    transform-style:preserve-3d;
+    transition:transform .6s ease;
+  }
+
+  /* the thick book base (under-pages stack) */
+  .book::before,
+  .book::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:14px;
+    background:repeating-linear-gradient(
+        to bottom,
+        #e7d8b6 0px, #e7d8b6 2px,
+        #d8c69e 2px, #d8c69e 4px);
+    box-shadow:0 30px 60px rgba(0,0,0,.55);
+  }
+  .book::before{ transform:translate(10px,12px); filter:brightness(.9); }
+  .book::after{ transform:translate(5px,6px); filter:brightness(.96); }
+
+  .spread{
+    position:absolute;
+    inset:0;
+    display:flex;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 0 80px rgba(120,90,50,.18);
+    background:var(--cream);
+  }
+
+  .page{
+    position:relative;
+    flex:1 1 50%;
+    padding:34px 40px;
+    overflow:hidden;
+    background:
+      radial-gradient(120% 100% at 0% 0%, #fbf3df 0%, transparent 60%),
+      radial-gradient(120% 100% at 100% 100%, #ead9b3 0%, transparent 60%),
+      var(--cream);
+  }
+  /* paper grain via tiny noisy gradients */
+  .page::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(rgba(120,90,50,.05) 1px, transparent 1px),
+      radial-gradient(rgba(120,90,50,.04) 1px, transparent 1px);
+    background-size:7px 7px, 11px 11px;
+    background-position:0 0, 3px 4px;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+    opacity:.7;
+  }
+  /* page vignette */
+  .page::after{
+    content:"";
+    position:absolute; inset:0;
+    box-shadow:inset 0 0 70px rgba(90,70,40,.22);
+    pointer-events:none;
+    border-radius:2px;
+  }
+
+  .page.left{ border-radius:14px 0 0 14px; box-shadow:inset -26px 0 40px -22px rgba(70,50,25,.55); }
+  .page.right{ border-radius:0 14px 14px 0; box-shadow:inset 26px 0 40px -22px rgba(70,50,25,.55); }
+
+  /* center spine */
+  .spine{
+    position:absolute;
+    top:0; bottom:0; left:50%;
+    width:34px;
+    transform:translateX(-50%);
+    z-index:6;
+    pointer-events:none;
+    background:linear-gradient(to right,
+      rgba(70,50,25,0) 0%,
+      rgba(70,50,25,.28) 42%,
+      rgba(70,50,25,.42) 50%,
+      rgba(70,50,25,.28) 58%,
+      rgba(70,50,25,0) 100%);
+  }
+
+  .page-inner{
+    position:relative;
+    z-index:3;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- typography ---------- */
+  .chapter-tag{
+    font-family:'Gaegu', cursive;
+    font-size:18px;
+    color:var(--rose);
+    letter-spacing:1px;
+    margin-bottom:6px;
+  }
+  .chapter-title{
+    font-size:30px;
+    font-weight:700;
+    color:var(--ink);
+    line-height:1.25;
+    margin-bottom:18px;
+  }
+  .story-text{
+    font-size:17.5px;
+    line-height:2.0;
+    color:var(--ink-soft);
+  }
+  .story-text strong{ color:var(--ink); }
+  .story-text .em{ color:var(--rose); font-weight:700; }
+  .drop{
+    float:left;
+    font-size:58px;
+    line-height:.8;
+    font-weight:700;
+    color:var(--rose);
+    margin:6px 12px 0 0;
+    font-family:'Gowun Batang',serif;
+  }
+
+  .page-num{
+    position:absolute;
+    bottom:14px;
+    font-family:'Gaegu',cursive;
+    font-size:15px;
+    color:var(--ink-soft);
+    opacity:.75;
+  }
+  .page.left .page-num{ left:40px; }
+  .page.right .page-num{ right:40px; }
+
+  /* ---------- POP-UP layer ---------- */
+  .popup{
+    transform-origin:bottom center;
+    transform:translateY(40px) scale(.7) rotate(0deg);
+    opacity:0;
+    transition:none;
+  }
+  .spread.active .popup{
+    animation:popUp .8s cubic-bezier(.2,1.4,.4,1) forwards;
+    animation-delay:var(--d, .15s);
+  }
+  @keyframes popUp{
+    0%{ transform:translateY(46px) scale(.6); opacity:0; }
+    60%{ transform:translateY(-6px) scale(1.04); opacity:1; }
+    100%{ transform:translateY(0) scale(1); opacity:1; }
+  }
+
+  /* gentle float idle */
+  .floaty{ animation:floaty 5s ease-in-out infinite; }
+  @keyframes floaty{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-7px);} }
+
+  /* ---------- CSS-drawn illustrations ---------- */
+  .scene{
+    position:relative;
+    flex:1;
+    margin-top:8px;
+  }
+
+  /* tree */
+  .tree{ position:absolute; }
+  .tree .trunk{ position:absolute; left:50%; bottom:0; width:14px; height:46px; background:linear-gradient(#9b6f45,#7c5631); transform:translateX(-50%); border-radius:4px; }
+  .tree .leaves{ position:absolute; left:50%; bottom:34px; width:90px; height:90px; transform:translateX(-50%); border-radius:50% 50% 48% 48%;
+    background:radial-gradient(circle at 35% 30%, #a7c486, var(--leaf) 70%); box-shadow:inset -8px -8px 0 rgba(80,110,60,.25); }
+  .tree .leaves::after{ content:""; position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:64px; height:64px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #b6d195, #93b173); }
+
+  /* little house */
+  .house{ position:absolute; width:96px; }
+  .house .body{ width:96px; height:62px; background:linear-gradient(#f0d8b0,#e4c391); border:2px solid #b78f5c; border-radius:6px; position:relative; box-shadow:inset 0 -8px 0 rgba(150,110,60,.15); }
+  .house .roof{ width:0;height:0; border-left:58px solid transparent; border-right:58px solid transparent; border-bottom:40px solid var(--rose); margin-left:-10px; margin-bottom:-2px; filter:drop-shadow(0 3px 0 rgba(150,70,55,.35)); }
+  .house .door{ position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:24px; height:34px; background:#9b6f45; border-radius:12px 12px 0 0; }
+  .house .win{ position:absolute; top:10px; right:12px; width:18px; height:18px; background:var(--sky); border:2px solid #b78f5c; border-radius:4px; }
+
+  /* star */
+  .star{
+    position:absolute;
+    width:26px; height:26px;
+    background:var(--gold);
+    clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+    filter:drop-shadow(0 2px 2px rgba(180,140,40,.4));
+  }
+  .star.sm{ width:16px;height:16px; opacity:.85; }
+  .twinkle{ animation:twinkle 3.5s ease-in-out infinite; }
+  @keyframes twinkle{ 0%,100%{opacity:.4; transform:scale(.85) rotate(0);} 50%{opacity:1; transform:scale(1.1) rotate(12deg);} }
+
+  /* cloud */
+  .cloud{ position:absolute; width:80px; height:30px; background:#fff8ea; border-radius:30px; box-shadow:0 6px 0 rgba(150,120,80,.08); }
+  .cloud::before,.cloud::after{ content:""; position:absolute; background:#fff8ea; border-radius:50%; }
+  .cloud::before{ width:34px;height:34px; top:-16px; left:14px; }
+  .cloud::after{ width:26px;height:26px; top:-12px; left:40px; }
+
+  /* hill */
+  .hill{ position:absolute; bottom:0; width:140%; left:-20%; height:90px; background:radial-gradient(80% 130% at 50% 100%, #a7c486 0%, var(--leaf) 70%); border-radius:50% 50% 0 0; }
+
+  /* little character (the designer) */
+  .charac{ position:relative; width:84px; height:120px; }
+  .charac .head{ position:absolute; top:0; left:50%; transform:translateX(-50%); width:46px; height:46px; border-radius:50%; background:#f5d8bd; border:2px solid #d9b08c; z-index:3; }
+  .charac .hair{ position:absolute; top:-4px; left:50%; transform:translateX(-50%); width:54px; height:30px; background:#5a4632; border-radius:50% 50% 40% 40%; z-index:4; }
+  .charac .face{ position:absolute; top:20px; left:50%; transform:translateX(-50%); width:30px; height:14px; z-index:5; }
+  .charac .face::before,.charac .face::after{ content:""; position:absolute; top:0; width:6px; height:6px; background:#5a4632; border-radius:50%; }
+  .charac .face::before{ left:2px; }
+  .charac .face::after{ right:2px; }
+  .charac .cheek{ position:absolute; top:30px; left:50%; transform:translateX(-50%); width:34px; }
+  .charac .cheek::before,.charac .cheek::after{ content:""; position:absolute; top:0; width:9px;height:6px; background:rgba(217,139,122,.6); border-radius:50%; }
+  .charac .cheek::before{ left:-1px; }
+  .charac .cheek::after{ right:-1px; }
+  .charac .smile{ position:absolute; top:34px; left:50%; transform:translateX(-50%); width:16px; height:8px; border-bottom:3px solid #b5715f; border-radius:0 0 16px 16px; z-index:6; }
+  .charac .body{ position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:60px; height:70px; background:linear-gradient(var(--rose),#c7766a); border-radius:30px 30px 16px 16px; z-index:2; }
+  .charac .arm{ position:absolute; bottom:26px; width:14px; height:42px; background:linear-gradient(var(--rose),#c7766a); border-radius:8px; z-index:1; }
+  .charac .arm.l{ left:4px; transform:rotate(18deg); }
+  .charac .arm.r{ right:4px; transform:rotate(-18deg); }
+
+  /* flowers / grass dots */
+  .flower{ position:absolute; width:18px; height:18px; }
+  .flower::before{ content:""; position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 50% 50%, var(--gold) 0 26%, var(--plum) 27%); }
+  .flower::after{ content:""; position:absolute; left:7px; top:16px; width:3px; height:16px; background:var(--leaf); }
+
+  /* project "spell book" item card */
+  .proj-grid{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px; }
+  .proj{
+    position:relative;
+    display:flex; gap:14px; align-items:center;
+    background:linear-gradient(#fbf3df,#f0e2c4);
+    border:2px solid #d9c39a;
+    border-radius:14px;
+    padding:12px 14px;
+    box-shadow:0 6px 0 rgba(160,125,75,.18);
+  }
+  .proj .badge{
+    flex:0 0 auto;
+    width:52px;height:52px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;
+    background:var(--cream2);
+    border:2px solid #d9c39a;
+  }
+  .proj h4{ font-size:18px; color:var(--ink); margin-bottom:3px; }
+  .proj p{ font-size:14px; line-height:1.55; color:var(--ink-soft); }
+  .proj .tag{ display:inline-block; font-family:'Gaegu',cursive; font-size:12px; color:#fff; background:var(--leaf); padding:1px 8px; border-radius:10px; margin-top:4px; }
+
+  /* ---------- COVER spread ---------- */
+  .cover{
+    background:
+      radial-gradient(140% 100% at 50% 0%, #e9b98f 0%, transparent 55%),
+      radial-gradient(120% 100% at 50% 100%, #cf8d7c 0%, transparent 55%),
+      linear-gradient(160deg, #d99a82, #c47e6c);
+  }
+  .cover .page-inner{ align-items:center; justify-content:center; text-align:center; color:#fff7ec; }
+  .cover-frame{
+    border:3px double rgba(255,247,236,.7);
+    border-radius:18px;
+    padding:26px 22px;
+    width:88%;
+    box-shadow:0 0 0 8px rgba(255,247,236,.12);
+  }
+  .cover-sub{ font-family:'Gaegu',cursive; font-size:18px; letter-spacing:2px; opacity:.9; }
+  .cover-title{ font-size:42px; font-weight:700; line-height:1.3; margin:8px 0 4px; text-shadow:0 2px 0 rgba(120,60,50,.35); }
+  .cover-role{ font-family:'Gaegu',cursive; font-size:18px; opacity:.95; margin-bottom:8px; }
+  .cover-orn{ font-size:22px; opacity:.85; margin:6px 0; }
+
+  .open-btn{
+    margin-top:18px;
+    font-family:'Gowun Batang',serif;
+    font-size:18px;
+    font-weight:700;
+    color:#b5715f;
+    background:#fff7ec;
+    border:none;
+    border-radius:30px;
+    padding:12px 28px;
+    cursor:pointer;
+    box-shadow:0 6px 0 rgba(120,60,50,.3);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .open-btn:hover{ transform:translateY(-2px); box-shadow:0 8px 0 rgba(120,60,50,.3); }
+  .open-btn:active{ transform:translateY(3px); box-shadow:0 2px 0 rgba(120,60,50,.3); }
+
+  /* ---------- CONTACT ---------- */
+  .contact-card{ margin-top:8px; }
+  .contact-row{
+    display:flex; align-items:center; gap:12px;
+    font-size:17px; color:var(--ink);
+    padding:9px 0;
+    border-bottom:1px dashed #cdb88e;
+  }
+  .contact-row .ic{ font-size:20px; }
+  .contact-row a{ color:var(--rose); text-decoration:none; border-bottom:1px solid transparent; }
+  .contact-row a:hover{ border-bottom-color:var(--rose); }
+  .the-end{
+    font-family:'Gaegu',cursive;
+    font-size:40px;
+    color:var(--rose);
+    text-align:center;
+    margin-top:18px;
+  }
+
+  /* ---------- page-flip animation ---------- */
+  .flipper{
+    position:absolute;
+    top:0; right:0;
+    width:50%;
+    height:100%;
+    z-index:30;
+    transform-style:preserve-3d;
+    transform-origin:left center;
+    pointer-events:none;
+    border-radius:0 14px 14px 0;
+  }
+  .flip-face{
+    position:absolute; inset:0;
+    border-radius:0 14px 14px 0;
+    overflow:hidden;
+    backface-visibility:hidden;
+    background:
+      radial-gradient(120% 100% at 100% 100%, #ead9b3 0%, transparent 60%),
+      var(--cream);
+    box-shadow:inset 26px 0 40px -22px rgba(70,50,25,.55);
+  }
+  .flip-face.back{ transform:rotateY(180deg); border-radius:14px 0 0 14px; box-shadow:inset -26px 0 40px -22px rgba(70,50,25,.55); }
+  .flip-shade{
+    position:absolute; inset:0;
+    background:linear-gradient(to right, rgba(60,40,20,0), rgba(60,40,20,.32));
+    opacity:0; transition:opacity .3s;
+    border-radius:0 14px 14px 0;
+    pointer-events:none;
+  }
+
+  .flip-forward{ animation:flipFwd .85s ease-in-out forwards; }
+  .flip-backward{ transform:rotateY(-180deg); animation:flipBwd .85s ease-in-out forwards; }
+  @keyframes flipFwd{
+    0%{ transform:rotateY(0); }
+    100%{ transform:rotateY(-180deg); }
+  }
+  @keyframes flipBwd{
+    0%{ transform:rotateY(-180deg); }
+    100%{ transform:rotateY(0); }
+  }
+
+  /* ---------- nav corners ---------- */
+  .corner{
+    position:absolute;
+    bottom:0;
+    width:74px; height:74px;
+    z-index:20;
+    cursor:pointer;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    font-family:'Gaegu',cursive;
+    font-size:15px;
+    color:var(--ink);
+    padding-bottom:12px;
+    transition:transform .25s ease;
+  }
+  .corner.next{ right:0; }
+  .corner.prev{ left:0; }
+  .corner::before{
+    content:"";
+    position:absolute;
+    bottom:0;
+    width:74px; height:74px;
+    background:linear-gradient(135deg, transparent 50%, rgba(200,165,110,.55) 50%);
+  }
+  .corner.next::before{ right:0; }
+  .corner.prev::before{ left:0; transform:scaleX(-1); }
+  .corner span{ position:relative; z-index:2; transform:translateY(-2px); }
+  .corner.next:hover{ transform:translate(-2px,-2px); }
+  .corner.prev:hover{ transform:translate(2px,-2px); }
+  .corner.hidden{ display:none; }
+
+  /* progress dots */
+  .progress{
+    position:fixed;
+    bottom:18px; left:50%;
+    transform:translateX(-50%);
+    z-index:40;
+    display:flex; gap:9px;
+    background:rgba(255,247,236,.1);
+    padding:8px 14px; border-radius:20px;
+    backdrop-filter:blur(2px);
+  }
+  .progress .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:rgba(255,247,236,.35);
+    cursor:pointer; transition:.25s;
+  }
+  .progress .dot.on{ background:var(--gold); transform:scale(1.3); }
+
+  .hint{
+    position:fixed; top:20px; left:50%; transform:translateX(-50%);
+    z-index:40; font-family:'Gaegu',cursive; color:rgba(255,247,236,.65);
+    font-size:14px; letter-spacing:1px;
+    animation:hintFade 6s ease forwards;
+  }
+  @keyframes hintFade{ 0%,70%{opacity:1;} 100%{opacity:0;} }
+
+  @media (max-width:720px){
+    .chapter-title{ font-size:23px; }
+    .story-text{ font-size:15px; line-height:1.85; }
+    .cover-title{ font-size:30px; }
+    .page{ padding:22px 22px; }
+    .proj .badge{ width:42px;height:42px; font-size:20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="room-blob b1"></div>
+  <div class="room-blob b2"></div>
+  <div class="room-blob b3"></div>
+
+  <div class="hint">◀ ▶ 또는 책 모서리를 눌러 책장을 넘겨보세요</div>
+
+  <div class="stage">
+    <div class="book" id="book">
+      <div class="spine"></div>
+      <div class="spread" id="spread">
+        <div class="page left" id="pageL"></div>
+        <div class="page right" id="pageR"></div>
+      </div>
+
+      <div class="flipper" id="flipper">
+        <div class="flip-face front" id="flipFront"></div>
+        <div class="flip-face back" id="flipBack"></div>
+        <div class="flip-shade"></div>
+      </div>
+
+      <div class="corner prev" id="prev"><span>◀ 이전</span></div>
+      <div class="corner next" id="next"><span>다음 ▶</span></div>
+    </div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- illustration helpers (return HTML strings) ---------- */
+  function ill(){
+    return {
+      cover: ''
+        + '<div class="charac floaty" style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%)">'
+        +   charac() + '</div>',
+    };
+  }
+
+  function charac(){
+    return '<div class="charac">'
+      + '<div class="arm l"></div><div class="arm r"></div>'
+      + '<div class="body"></div>'
+      + '<div class="hair"></div><div class="head"></div>'
+      + '<div class="face"></div><div class="cheek"></div><div class="smile"></div>'
+      + '</div>';
+  }
+  function tree(x,b,s){ return '<div class="tree popup floaty" style="left:'+x+';bottom:'+b+';transform:scale('+(s||1)+');--d:'+(0.2+Math.random()*0.3).toFixed(2)+'s"><div class="leaves"></div><div class="trunk"></div></div>'; }
+  function house(x,b){ return '<div class="house popup" style="left:'+x+';bottom:'+b+';--d:.35s"><div class="roof"></div><div class="body"><div class="win"></div><div class="door"></div></div></div>'; }
+  function star(x,t,sm){ return '<div class="star '+(sm?'sm':'')+' popup twinkle" style="left:'+x+';top:'+t+';--d:'+(0.2+Math.random()*0.6).toFixed(2)+'s"></div>'; }
+  function cloud(x,t){ return '<div class="cloud popup floaty" style="left:'+x+';top:'+t+';--d:.25s"></div>'; }
+  function flower(x,b){ return '<div class="flower popup" style="left:'+x+';bottom:'+b+';--d:'+(0.4+Math.random()*0.4).toFixed(2)+'s"></div>'; }
+  function hill(){ return '<div class="hill"></div>'; }
+
+  /* ---------- spreads data ---------- */
+  var spreads = [
+    /* 0 : COVER */
+    {
+      cover:true,
+      L: ''
+        + '<div class="cover-frame">'
+        +   '<div class="cover-orn">✦ ❀ ✦</div>'
+        +   '<div class="cover-sub">옛날 옛적에...</div>'
+        +   '<div class="cover-title">WOO HEE JIN<br>의 이야기</div>'
+        +   '<div class="cover-role">Product Designer · PM</div>'
+        +   '<div class="cover-orn">~ a little storybook ~</div>'
+        +   '<button class="open-btn" id="openBtn">펼쳐보기 ✶</button>'
+        + '</div>',
+      R: ''
+        + '<div style="position:relative;height:100%">'
+        +   star('14%','12%',true) + star('78%','9%') + star('40%','6%',true) + cloud('8%','22%')
+        +   hill()
+        +   '<div class="charac floaty popup" style="position:absolute;left:50%;bottom:78px;transform:translateX(-50%);--d:.3s">'+charac()+'</div>'
+        +   tree('14%','64px',.8) + tree('82%','64px',.9) + flower('30%','60px') + flower('66%','58px')
+        + '</div>',
+      coverPage:true
+    },
+
+    /* 1 : Chapter 1 */
+    {
+      L: ''
+        + '<div class="chapter-tag">✦ 제 1 장 ✦</div>'
+        + '<div class="chapter-title">옛날 옛적에,<br>사람의 마음을 듣던 사람</div>'
+        + '<div class="story-text">'
+        +   '<span class="drop">옛</span>날 옛적에, 사람들의 <span class="em">진짜 고민</span>을 듣는 걸 좋아하는 사람이 있었어요.'
+        +   '<br><br>그는 <strong>한샘</strong>에서, 또 <strong>집닥</strong>에서 매일 현장으로 나가 고객을 만났어요. '
+        +   '카탈로그 너머의 진짜 이야기 — "사실은 이게 불편했어요" 하는 작은 목소리들을 하나하나 마음에 담았지요.'
+        +   '<br><br>그렇게 그는 알게 됐어요. 좋은 것은 책상이 아니라, <span class="em">사람 곁에서</span> 태어난다는 걸.'
+        + '</div>',
+      R: ''
+        + '<div class="scene">'
+        +   cloud('10%','8%') + cloud('60%','18%')
+        +   hill()
+        +   house('20%','70px') + tree('72%','70px',1)
+        +   '<div class="charac floaty popup" style="position:absolute;left:48%;bottom:74px;transform:translateX(-50%);--d:.45s">'+charac()+'</div>'
+        +   flower('14%','64px') + flower('40%','60px') + flower('86%','64px') + flower('60%','58px')
+        + '</div>'
+    },
+
+    /* 2 : Chapter 2 */
+    {
+      L: ''
+        + '<div class="chapter-tag">✦ 제 2 장 ✦</div>'
+        + '<div class="chapter-title">모험의 시작 —<br>기획과 장사의 숲으로</div>'
+        + '<div class="story-text">'
+        +   '<span class="drop">어</span>느 날 그는 더 큰 세상이 궁금해졌어요. 그래서 <strong>인터스텔라</strong>에서 '
+        +   '<span class="em">비즈니스를 기획</span>하며, 아이디어가 어떻게 사업이 되는지를 배웠지요.'
+        +   '<br><br>하지만 진짜 모험은 그 다음이었어요. 그는 <strong>미스타교자</strong>의 <span class="em">사장님</span>이 되어 '
+        +   '직접 가게를 열고, 손님을 맞고, 만두를 빚었어요.'
+        +   '<br><br>숫자와 사람, 메뉴와 마음 사이에서 — 그는 비로소 <strong>"만드는 사람"</strong>의 진짜 무게를 알게 됐답니다.'
+        + '</div>',
+      R: ''
+        + '<div class="scene">'
+        +   cloud('55%','6%')
+        +   hill()
+        +   house('46%','70px')
+        +   '<div class="house popup" style="left:6%;bottom:70px;transform:scale(.8);--d:.3s"><div class="roof"></div><div class="body"><div class="win"></div><div class="door"></div></div></div>'
+        +   tree('80%','70px',.9) + tree('30%','70px',.7)
+        +   '<div class="popup floaty" style="position:absolute;left:50%;bottom:140px;transform:translateX(-50%);font-size:30px;--d:.5s">🥟</div>'
+        +   flower('18%','62px') + flower('66%','60px')
+        + '</div>'
+    },
+
+    /* 3 : Chapter 3 */
+    {
+      L: ''
+        + '<div class="chapter-tag">✦ 제 3 장 ✦</div>'
+        + '<div class="chapter-title">마법을 배우다</div>'
+        + '<div class="story-text">'
+        +   '<span class="drop">그</span>러던 어느 밤, 그는 신비로운 <span class="em">마법</span>을 만났어요. 바로 <strong>AI</strong>였지요.'
+        +   '<br><br>그는 디자인을 배우고, 개발을 배우고, AI라는 지팡이를 손에 쥐었어요. '
+        +   '이제는 누군가에게 부탁하지 않아도, <span class="em">머릿속의 상상을 직접 제품으로</span> 빚어낼 수 있게 되었답니다.'
+        +   '<br><br>기획자의 눈, 사장님의 손, 그리고 마법사의 지팡이 — 세 가지가 하나가 되는 순간이었어요.'
+        + '</div>',
+      R: ''
+        + '<div class="scene">'
+        +   star('12%','10%') + star('40%','6%',true) + star('70%','12%') + star('86%','26%',true) + star('24%','30%',true)
+        +   cloud('58%','40%')
+        +   hill()
+        +   tree('80%','70px',.85)
+        +   '<div class="popup floaty" style="position:absolute;left:46%;bottom:120px;transform:translateX(-50%);font-size:34px;--d:.45s">✨🪄✨</div>'
+        +   '<div class="charac floaty popup" style="position:absolute;left:30%;bottom:74px;transform:translateX(-50%);--d:.55s">'+charac()+'</div>'
+        +   flower('60%','62px') + flower('20%','60px')
+        + '</div>'
+    },
+
+    /* 4 : Chapter 4 — projects */
+    {
+      L: ''
+        + '<div class="chapter-tag">✦ 제 4 장 ✦</div>'
+        + '<div class="chapter-title">그가 만든 것들</div>'
+        + '<div class="story-text" style="font-size:16px;line-height:1.9">'
+        +   '마법을 손에 쥔 그는, 작은 세계들을 하나씩 만들기 시작했어요. '
+        +   '각각의 이야기를 가진 <span class="em">세 가지 보물</span>이지요.'
+        + '</div>'
+        + '<div class="proj-grid">'
+        +   '<div class="proj popup" style="--d:.25s"><div class="badge">🎈</div>'
+        +     '<div><h4>노톡</h4><p>관계의 부담 없이 가볍게 모이는 <strong>팝업 커뮤니티</strong>.</p>'
+        +     '<span class="tag">Community</span></div></div>'
+        +   '<div class="proj popup" style="--d:.45s"><div class="badge">🫧</div>'
+        +     '<div><h4>오늘뽁</h4><p>스트레스를 <strong>뽁뽁</strong> 터뜨리는 앱. <em>Google Play 출시</em> 🎉</p>'
+        +     '<span class="tag" style="background:var(--rose)">Launched</span></div></div>'
+        +   '<div class="proj popup" style="--d:.65s"><div class="badge">🔔</div>'
+        +     '<div><h4>끄숑</h4><p>잔소리하는 디지털 디톡스 트레이너. <strong>F/T 모드</strong>로 다정하게 혹은 단호하게.</p>'
+        +     '<span class="tag" style="background:var(--plum)">Detox</span></div></div>'
+        + '</div>',
+      R: ''
+        + '<div class="scene">'
+        +   cloud('12%','8%') + cloud('64%','16%') + star('86%','40%',true)
+        +   hill()
+        +   '<div class="popup floaty" style="position:absolute;left:22%;bottom:120px;font-size:30px;--d:.3s">🎈</div>'
+        +   '<div class="popup floaty" style="position:absolute;left:50%;bottom:150px;font-size:30px;--d:.5s">🫧</div>'
+        +   '<div class="popup floaty" style="position:absolute;left:74%;bottom:120px;font-size:28px;--d:.7s">🔔</div>'
+        +   house('20%','70px') + house('60%','70px') + tree('88%','70px',.8)
+        +   flower('14%','62px') + flower('44%','60px') + flower('78%','62px')
+        + '</div>'
+    },
+
+    /* 5 : Last page — contact */
+    {
+      L: ''
+        + '<div class="chapter-tag">✦ 마지막 장 ✦</div>'
+        + '<div class="chapter-title">끝, 그리고<br>다음 이야기</div>'
+        + '<div class="story-text">'
+        +   '<span class="drop">이</span> 이야기는 여기서 잠시 멈춰요. 하지만 끝이 아니랍니다.'
+        +   '<br><br>그는 지금도 새로운 페이지를 기다리고 있어요. '
+        +   '<span class="em">다음 이야기를 함께 쓰고 싶다면,</span> 언제든 문을 두드려 주세요.'
+        + '</div>'
+        + '<div class="contact-card">'
+        +   '<div class="contact-row"><span class="ic">✉️</span><a href="mailto:zbxm2000@naver.com">zbxm2000@naver.com</a></div>'
+        +   '<div class="contact-row"><span class="ic">☎️</span><a href="tel:01099668132">010-9966-8132</a></div>'
+        + '</div>',
+      R: ''
+        + '<div class="scene">'
+        +   star('14%','10%',true) + star('46%','7%') + star('78%','12%',true) + star('64%','26%',true) + cloud('20%','30%')
+        +   hill()
+        +   '<div class="charac floaty popup" style="position:absolute;left:50%;bottom:78px;transform:translateX(-50%);--d:.4s">'+charac()+'</div>'
+        +   tree('14%','64px',.8) + tree('84%','64px',.85) + flower('32%','60px') + flower('66%','58px')
+        +   '<div class="the-end popup" style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);--d:.9s">끝 ❀</div>'
+        + '</div>'
+    }
+  ];
+
+  /* ---------- engine ---------- */
+  var idx = 0, animating = false;
+  var pageL = document.getElementById('pageL');
+  var pageR = document.getElementById('pageR');
+  var spreadEl = document.getElementById('spread');
+  var flipper = document.getElementById('flipper');
+  var flipFront = document.getElementById('flipFront');
+  var flipBack = document.getElementById('flipBack');
+  var flipShade = flipper.querySelector('.flip-shade');
+  var prevBtn = document.getElementById('prev');
+  var nextBtn = document.getElementById('next');
+  var progress = document.getElementById('progress');
+
+  function pageNumHTML(n){ return '<div class="page-num">~ '+n+' ~</div>'; }
+
+  function renderSpread(i){
+    var s = spreads[i];
+    spreadEl.className = 'spread';                 // reset to retrigger pop-up animation
+    pageL.className = 'page left' + (s.cover ? ' cover' : '');
+    pageR.className = 'page right' + (s.cover ? ' cover' : '');
+    var pnL = s.cover ? '' : pageNumHTML(i*2);
+    var pnR = s.cover ? '' : pageNumHTML(i*2+1);
+    pageL.innerHTML = '<div class="page-inner">'+ s.L +'</div>'+ pnL;
+    pageR.innerHTML = '<div class="page-inner">'+ s.R +'</div>'+ pnR;
+
+    // force reflow then activate -> pop-ups animate
+    void spreadEl.offsetWidth;
+    spreadEl.classList.add('active');
+
+    prevBtn.classList.toggle('hidden', i === 0);
+    nextBtn.classList.toggle('hidden', i === spreads.length - 1);
+
+    // re-bind cover open button
+    var ob = document.getElementById('openBtn');
+    if(ob){ ob.addEventListener('click', function(){ go(1); }); }
+
+    updateDots();
+  }
+
+  function buildDots(){
+    progress.innerHTML = '';
+    for(var i=0;i<spreads.length;i++){
+      (function(i){
+        var d = document.createElement('div');
+        d.className = 'dot';
+        d.addEventListener('click', function(){ if(i!==idx) jumpTo(i); });
+        progress.appendChild(d);
+      })(i);
+    }
+  }
+  function updateDots(){
+    var dots = progress.children;
+    for(var i=0;i<dots.length;i++) dots[i].className = 'dot' + (i===idx ? ' on' : '');
+  }
+
+  /* build a static face snapshot for the flipping page */
+  function faceHTML(i, side){
+    if(i<0 || i>=spreads.length) return '';
+    var s = spreads[i];
+    var content = (side === 'right') ? s.R : s.L;
+    var coverCls = s.cover ? ' cover' : '';
+    return '<div class="page '+(side)+coverCls+'" style="position:absolute;inset:0;flex:none">'
+         + '<div class="page-inner">'+content+'</div></div>';
+  }
+
+  function go(target){
+    if(animating || target<0 || target>=spreads.length || target===idx) return;
+    var forward = target > idx;
+    animating = true;
+
+    // set up flipping sheet faces
+    flipper.style.display = 'block';
+    if(forward){
+      // front = current right page ; back = next left page
+      flipFront.innerHTML = faceHTML(idx, 'right');
+      flipBack.innerHTML  = faceHTML(target, 'left');
+      flipper.classList.remove('flip-backward','flip-forward');
+      void flipper.offsetWidth;
+      flipper.classList.add('flip-forward');
+      flipShade.style.opacity = '1';
+    } else {
+      // backward: front = current left, back = prev right (but flipper sits on right side,
+      // so we animate from -180 to 0)
+      flipFront.innerHTML = faceHTML(idx, 'left');
+      flipBack.innerHTML  = faceHTML(target, 'right');
+      flipper.classList.remove('flip-backward','flip-forward');
+      void flipper.offsetWidth;
+      flipper.classList.add('flip-backward');
+      flipShade.style.opacity = '0';
+    }
+
+    // swap underlying spread roughly mid-flip so it's revealed correctly
+    setTimeout(function(){
+      idx = target;
+      renderSpread(idx);
+    }, 430);
+
+    setTimeout(function(){
+      flipper.classList.remove('flip-backward','flip-forward');
+      flipper.style.display = 'none';
+      flipShade.style.opacity = '0';
+      animating = false;
+    }, 880);
+  }
+
+  function jumpTo(i){
+    // simple flip in the appropriate direction
+    go(i);
+  }
+
+  function next(){ go(idx+1); }
+  function prev(){ go(idx-1); }
+
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+
+  // edge clicks on the pages
+  pageR.addEventListener('click', function(e){
+    if(e.target.closest('a') || e.target.closest('button')) return;
+    next();
+  });
+  pageL.addEventListener('click', function(e){
+    if(idx===0) return; // cover left shouldn't go back
+    if(e.target.closest('a') || e.target.closest('button')) return;
+    prev();
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight') next();
+    else if(e.key === 'ArrowLeft') prev();
+  });
+
+  // init
+  flipper.style.display = 'none';
+  buildDots();
+  renderSpread(0);
+})();
+</script>
+</body>
+</html>

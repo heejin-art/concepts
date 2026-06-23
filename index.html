@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOO HEE JIN · 컨셉 데모 5종</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Noto Sans KR',sans-serif;background:#0e0e16;color:#f4f4f8;min-height:100vh;padding:64px 24px 96px;
+    background-image:radial-gradient(900px 500px at 15% 0%,rgba(120,90,255,.18),transparent 60%),radial-gradient(800px 600px at 90% 20%,rgba(0,200,220,.14),transparent 60%)}
+  .wrap{max-width:1120px;margin:0 auto}
+  .kicker{font-size:13px;letter-spacing:.32em;color:#8b8ba7;text-transform:uppercase;margin-bottom:14px}
+  h1{font-family:'Gowun Batang',serif;font-size:clamp(30px,5vw,52px);line-height:1.18;margin-bottom:16px}
+  h1 span{background:linear-gradient(90deg,#a98bff,#5ad7ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .lead{color:#b9b9cc;font-size:16px;line-height:1.7;max-width:640px;margin-bottom:48px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px}
+  a.card{display:block;text-decoration:none;color:inherit;border-radius:20px;padding:28px;position:relative;overflow:hidden;
+    border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,background .35s}
+  a.card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.07)}
+  .num{font-family:'Gowun Batang',serif;font-size:14px;color:#8b8ba7;letter-spacing:.2em}
+  .swatch{height:120px;border-radius:14px;margin:16px 0 18px;position:relative;overflow:hidden}
+  .ttl{font-family:'Gowun Batang',serif;font-size:24px;margin-bottom:6px}
+  .en{font-size:12px;letter-spacing:.18em;color:#8b8ba7;text-transform:uppercase;margin-bottom:12px}
+  .desc{font-size:13.5px;color:#c2c2d4;line-height:1.65}
+  .tag{display:inline-block;margin-top:16px;font-size:12px;color:#cfcfe0;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 12px}
+  .arrow{position:absolute;top:24px;right:24px;color:#8b8ba7;font-size:20px;transition:transform .35s,color .35s}
+  a.card:hover .arrow{transform:translate(4px,-4px);color:#fff}
+  /* swatches */
+  .s-space{background:radial-gradient(120px 80px at 30% 30%,#6a5cff,transparent 70%),radial-gradient(140px 90px at 75% 65%,#1fd1d1,transparent 70%),#070712}
+  .s-space::after{content:"";position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20% 40%,#fff,transparent),radial-gradient(1px 1px at 60% 20%,#fff,transparent),radial-gradient(1px 1px at 80% 70%,#fff,transparent),radial-gradient(1px 1px at 40% 80%,#fff,transparent);opacity:.8}
+  .s-vending{background:linear-gradient(135deg,#ffd9e7,#bdf3e6 60%,#fff6d6)}
+  .s-story{background:linear-gradient(135deg,#fbe8cf,#f6d2b8 55%,#e9c3d8)}
+  .s-park{background:linear-gradient(135deg,#ffd166,#ff8fab 50%,#7ad7f0)}
+  .s-aqua{background:linear-gradient(180deg,#2bd0c4,#1668b8 60%,#06203f)}
+  .foot{margin-top:56px;color:#7c7c93;font-size:13px;line-height:1.8}
+  .foot b{color:#c9c9dc;font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">WOO HEE JIN · Concept Website · Demo Gallery</div>
+  <h1>컨셉 사이트 <span>기획안 5종</span><br>데모를 직접 눌러보세요</h1>
+  <p class="lead">깔끔한 포트폴리오와 정반대 축 — 무드가 확실한 5개의 세계관입니다. 각 카드를 클릭하면 실제로 동작하는 데모가 열립니다. 마음에 드는 방향을 고르면, 그 컨셉으로 풀 사이트를 제작합니다.</p>
+
+  <div class="grid">
+    <a class="card" href="v1/01-space/"><span class="arrow">↗</span>
+      <div class="num">01</div>
+      <div class="swatch s-space"></div>
+      <div class="ttl">우주 유영</div>
+      <div class="en">Cosmic Drift</div>
+      <div class="desc">딥네이비·네온의 고요한 우주. 별 패럴랙스와 로켓 커서, 스크롤하면 우주를 표류하고 프로젝트는 행성으로 다가갑니다.</div>
+      <span class="tag">몽환 · 고요</span>
+    </a>
+    <a class="card" href="v1/02-vending/"><span class="arrow">↗</span>
+      <div class="num">02</div>
+      <div class="swatch s-vending"></div>
+      <div class="ttl">레트로 자판기</div>
+      <div class="en">Gacha Vending</div>
+      <div class="desc">코인 투입 → 버튼을 누르면 캡슐이 툭 떨어져 열립니다. 프로젝트는 가챠 캡슐, 스킬은 과자 진열대.</div>
+      <span class="tag">말랑 · 키치</span>
+    </a>
+    <a class="card" href="v1/03-storybook/"><span class="arrow">↗</span>
+      <div class="num">03</div>
+      <div class="swatch s-story"></div>
+      <div class="ttl">팝업 동화책</div>
+      <div class="en">Pop-up Storybook</div>
+      <div class="desc">수채·종이질감의 그림책. 페이지를 넘기면 종이 팝업이 일어나고, 희진의 여정이 동화로 펼쳐집니다.</div>
+      <span class="tag">따뜻 · 서사</span>
+    </a>
+    <a class="card" href="v1/04-themepark/"><span class="arrow">↗</span>
+      <div class="num">04</div>
+      <div class="swatch s-park"></div>
+      <div class="ttl">테마파크 맵</div>
+      <div class="en">Theme Park</div>
+      <div class="desc">티켓 받고 입장하면 펼쳐지는 놀이공원. 캐릭터를 움직여 어트랙션에 탑승하면 프로젝트가 열립니다.</div>
+      <span class="tag">축제 · 활기</span>
+    </a>
+    <a class="card" href="v1/05-aquarium/"><span class="arrow">↗</span>
+      <div class="num">05</div>
+      <div class="swatch s-aqua"></div>
+      <div class="ttl">심해 아쿠아리움</div>
+      <div class="en">Dream Aquarium</div>
+      <div class="desc">청록빛 심해. 마우스를 따라오는 해파리와 기포, 빛나는 심해 생물로 다가오는 프로젝트. 차분하고 몽환적.</div>
+      <span class="tag">몽환 · 차분</span>
+    </a>
+  </div>
+
+  <div class="foot">
+    <b>보는 법</b> · 각 데모는 한 화면 안에서 컨셉의 핵심 인터랙션을 보여주는 프로토타입입니다 (풀 사이트 아님).<br>
+    <b>다음 단계</b> · 마음에 드는 번호를 알려주시면 그 컨셉으로 전체 페이지(About·프로젝트·Skills·Contact)를 제작해 GitHub에 푸시합니다.
+  </div>
+</div>
+</body>
+</html>

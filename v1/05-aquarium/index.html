@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WOO HEE JIN — Dream Aquarium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0fb6b1;
+    --deep:#021026;
+    --mid:#063a5e;
+    --glow:#7df9ff;
+    --bio:#9b8cff;
+    --bio2:#5ffbf1;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    color:#dff6ff;
+    background:#021026;
+    overflow-x:hidden;
+    cursor:none;
+  }
+  h1,h2,h3,.serif{font-family:'Gowun Batang',serif;}
+
+  /* ===== Fixed underwater background ===== */
+  .ocean{
+    position:fixed;
+    inset:0;
+    z-index:-3;
+    background:linear-gradient(180deg,
+      #0c6b6e 0%,
+      #0a5a72 14%,
+      #074866 30%,
+      #053450 48%,
+      #03223c 66%,
+      #021529 82%,
+      #010a18 100%);
+  }
+  /* subtle horizontal ambient sway tint */
+  .ocean::after{
+    content:"";
+    position:absolute;inset:-20% -20%;
+    background:radial-gradient(60% 50% at 50% 0%, rgba(125,249,255,.10), transparent 70%);
+    animation:sway 16s ease-in-out infinite;
+  }
+  @keyframes sway{
+    0%,100%{transform:translateX(-3%) translateY(0);}
+    50%{transform:translateX(3%) translateY(1%);}
+  }
+
+  /* ===== Caustic light rays from top ===== */
+  .rays{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none;}
+  .ray{
+    position:absolute;
+    top:-30%;
+    width:18vw;height:140vh;
+    background:linear-gradient(180deg, rgba(180,255,250,.16), rgba(180,255,250,0) 70%);
+    filter:blur(14px);
+    transform-origin:top center;
+    mix-blend-mode:screen;
+    opacity:.6;
+  }
+  .ray:nth-child(1){left:6%;animation:rayMove 13s ease-in-out infinite;}
+  .ray:nth-child(2){left:28%;width:12vw;animation:rayMove 17s ease-in-out infinite reverse;}
+  .ray:nth-child(3){left:48%;width:22vw;animation:rayMove 19s ease-in-out infinite;}
+  .ray:nth-child(4){left:70%;width:10vw;animation:rayMove 15s ease-in-out infinite reverse;}
+  .ray:nth-child(5){left:85%;width:16vw;animation:rayMove 21s ease-in-out infinite;}
+  @keyframes rayMove{
+    0%,100%{transform:rotate(-4deg) scaleX(1);opacity:.4;}
+    50%{transform:rotate(4deg) scaleX(1.15);opacity:.75;}
+  }
+
+  /* ===== Canvas for bubbles / followers ===== */
+  #fx{position:fixed;inset:0;z-index:1;pointer-events:none;}
+
+  /* custom glowing cursor dot */
+  .cursor{
+    position:fixed;z-index:50;top:0;left:0;
+    width:14px;height:14px;border-radius:50%;
+    background:radial-gradient(circle, rgba(180,255,255,.95), rgba(120,200,255,.2) 60%, transparent 70%);
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    box-shadow:0 0 18px 6px rgba(125,249,255,.6);
+    transition:width .2s,height .2s;
+  }
+
+  /* ===== Layout ===== */
+  section{position:relative;z-index:2;padding:0 8vw;}
+  .center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+
+  /* HERO */
+  #hero{min-height:100vh;}
+  .hero-inner{animation:float 7s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-18px);}}
+  #hero h1{
+    font-size:clamp(2.8rem,9vw,7rem);
+    letter-spacing:.18em;
+    font-weight:700;
+    color:#eafdff;
+    text-shadow:0 0 22px rgba(125,249,255,.65),0 0 50px rgba(95,251,241,.35);
+    animation:titleGlow 5s ease-in-out infinite;
+  }
+  @keyframes titleGlow{
+    0%,100%{text-shadow:0 0 22px rgba(125,249,255,.55),0 0 50px rgba(95,251,241,.3);}
+    50%{text-shadow:0 0 34px rgba(125,249,255,.9),0 0 80px rgba(155,140,255,.5);}
+  }
+  #hero .sub{
+    margin-top:1.6rem;
+    font-weight:300;
+    font-size:clamp(.95rem,2.2vw,1.35rem);
+    letter-spacing:.04em;
+    color:#bfeaf2;
+    max-width:42ch;
+    line-height:1.7;
+  }
+  .scroll-hint{
+    position:absolute;bottom:5vh;left:50%;transform:translateX(-50%);
+    font-family:'Gowun Batang',serif;
+    font-size:1rem;letter-spacing:.1em;color:#bff7ff;
+    opacity:.8;animation:bob 2.4s ease-in-out infinite;
+  }
+  @keyframes bob{0%,100%{transform:translate(-50%,0);opacity:.55;}50%{transform:translate(-50%,12px);opacity:1;}}
+
+  /* section heading */
+  .sec-head{font-size:clamp(1.8rem,5vw,3.2rem);color:#dffcff;
+    text-shadow:0 0 24px rgba(95,251,241,.4);margin-bottom:.6rem;letter-spacing:.06em;}
+  .sec-tag{font-weight:300;color:#8fc8d6;letter-spacing:.25em;text-transform:uppercase;font-size:.8rem;margin-bottom:3rem;}
+
+  /* PROJECTS */
+  #projects{min-height:120vh;padding-top:18vh;padding-bottom:14vh;}
+  .creatures{
+    display:flex;flex-wrap:wrap;gap:5vw;justify-content:center;align-items:center;
+    width:100%;max-width:1100px;margin:0 auto;
+  }
+  .creature{
+    position:relative;width:240px;height:340px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:none;
+  }
+  .creature .body{animation:floatSlow 8s ease-in-out infinite;will-change:transform;}
+  .creature:nth-child(2) .body{animation-duration:9.5s;animation-delay:-2s;}
+  .creature:nth-child(3) .body{animation-duration:7.5s;animation-delay:-4s;}
+  @keyframes floatSlow{0%,100%{transform:translateY(0) rotate(-1.5deg);}50%{transform:translateY(-26px) rotate(1.5deg);}}
+
+  /* --- Jellyfish (NOTALK) --- */
+  .jelly .bell{
+    width:120px;height:100px;border-radius:60px 60px 48px 48px;
+    background:radial-gradient(circle at 50% 35%, rgba(155,140,255,.95), rgba(95,140,255,.55) 60%, rgba(40,60,140,.2) 100%);
+    box-shadow:0 0 40px 8px rgba(155,140,255,.55),inset 0 -10px 30px rgba(255,255,255,.25);
+    position:relative;transition:box-shadow .4s,filter .4s;
+  }
+  .jelly .tentacles{position:absolute;top:88px;left:50%;transform:translateX(-50%);width:120px;display:flex;justify-content:space-around;}
+  .jelly .tentacles span{
+    width:4px;height:90px;border-radius:4px;
+    background:linear-gradient(180deg,rgba(155,140,255,.8),rgba(155,140,255,0));
+    animation:tent 4s ease-in-out infinite;
+  }
+  .jelly .tentacles span:nth-child(odd){animation-delay:-1.5s;height:110px;}
+  .jelly .tentacles span:nth-child(3n){animation-delay:-2.5s;height:75px;}
+  @keyframes tent{0%,100%{transform:scaleY(1) translateX(0);opacity:.85;}50%{transform:scaleY(.85) translateX(5px);opacity:1;}}
+
+  /* --- Anglerfish lantern (ONEULBBOK) --- */
+  .angler .lantern{
+    position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center;
+  }
+  .angler .orb-light{
+    width:46px;height:46px;border-radius:50%;
+    background:radial-gradient(circle,#fff6c9,#ffd86b 50%,#ff9d3c 100%);
+    box-shadow:0 0 50px 14px rgba(255,200,90,.65);
+    position:absolute;top:0;left:50%;transform:translateX(-50%);
+    animation:pulse 3.5s ease-in-out infinite;transition:box-shadow .4s;
+  }
+  .angler .stalk{position:absolute;top:42px;left:50%;width:5px;height:46px;background:linear-gradient(180deg,rgba(255,200,90,.7),rgba(120,200,200,.4));transform:translateX(-50%);}
+  .angler .fish{
+    position:absolute;top:84px;left:50%;transform:translateX(-50%);
+    width:130px;height:80px;border-radius:50% 60% 55% 45%/55% 60% 50% 50%;
+    background:radial-gradient(circle at 40% 40%, rgba(60,200,190,.85), rgba(20,80,110,.7) 70%);
+    box-shadow:0 0 30px 6px rgba(60,200,190,.4),inset 0 0 20px rgba(0,0,0,.4);
+  }
+  .angler .fish::after{content:"";position:absolute;right:-26px;top:24px;width:0;height:0;border:18px solid transparent;border-left:34px solid rgba(30,110,130,.7);}
+  .angler .eye{position:absolute;top:96px;left:42%;width:12px;height:12px;border-radius:50%;background:#0a1422;box-shadow:0 0 8px rgba(125,249,255,.8);}
+  @keyframes pulse{0%,100%{box-shadow:0 0 40px 10px rgba(255,200,90,.5);}50%{box-shadow:0 0 70px 20px rgba(255,210,110,.85);}}
+
+  /* --- Glowing orb (KKEUSYONG) --- */
+  .orb .core{
+    width:140px;height:140px;border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, #d6fff7, #5ffbf1 45%, #1aa3c4 75%, #0a3a55 100%);
+    box-shadow:0 0 55px 14px rgba(95,251,241,.6),inset 0 0 40px rgba(255,255,255,.3);
+    position:relative;transition:box-shadow .4s;animation:pulse2 5s ease-in-out infinite;
+  }
+  .orb .core::before{content:"";position:absolute;inset:18%;border-radius:50%;border:2px solid rgba(255,255,255,.25);}
+  .orb .ring{position:absolute;inset:-22px;border-radius:50%;border:1px solid rgba(95,251,241,.35);animation:spin 14s linear infinite;}
+  .orb .ring.b{inset:-40px;border-color:rgba(155,140,255,.3);animation-duration:20s;animation-direction:reverse;}
+  @keyframes pulse2{0%,100%{box-shadow:0 0 45px 10px rgba(95,251,241,.5);}50%{box-shadow:0 0 80px 22px rgba(95,251,241,.85);}}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* project card reveal */
+  .card{
+    position:absolute;bottom:-12px;left:50%;transform:translate(-50%,20px);
+    width:280px;padding:1.3rem 1.4rem;
+    background:rgba(8,30,52,.72);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(125,249,255,.35);
+    border-radius:18px;
+    box-shadow:0 10px 40px rgba(0,0,0,.45),0 0 30px rgba(95,251,241,.18);
+    opacity:0;pointer-events:none;
+    transition:opacity .45s ease,transform .45s ease;
+    text-align:left;z-index:5;
+  }
+  .card h3{font-size:1.3rem;color:#eafdff;margin-bottom:.15rem;letter-spacing:.04em;}
+  .card .en{font-size:.72rem;letter-spacing:.2em;color:#7fd9e6;text-transform:uppercase;margin-bottom:.6rem;display:block;}
+  .card p{font-size:.92rem;line-height:1.6;color:#cfeef5;font-weight:300;}
+  .card .meta{margin-top:.7rem;font-size:.78rem;color:#8fd0db;}
+  .card .meta b{color:#9b8cff;font-weight:500;}
+  .creature:hover .card{opacity:1;transform:translate(-50%,0);}
+  .creature:hover .bell,.creature:hover .core{filter:brightness(1.4);}
+  .creature:hover .bell{box-shadow:0 0 70px 20px rgba(155,140,255,.85),inset 0 -10px 30px rgba(255,255,255,.35);}
+  .creature:hover .core{box-shadow:0 0 95px 26px rgba(95,251,241,.95),inset 0 0 40px rgba(255,255,255,.4);}
+  .creature:hover .orb-light{box-shadow:0 0 90px 26px rgba(255,215,110,.95);}
+
+  /* ABOUT — depth meter */
+  #about{min-height:200vh;padding-top:14vh;}
+  .depth-readout{
+    position:sticky;top:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .depth-num{font-family:'Gowun Batang',serif;font-size:clamp(3rem,12vw,8rem);color:#9b8cff;
+    text-shadow:0 0 40px rgba(155,140,255,.6);transition:color .3s;letter-spacing:.02em;}
+  .depth-label{letter-spacing:.4em;font-size:.85rem;color:#8fc8d6;margin-top:.4rem;text-transform:uppercase;}
+  .stops{position:relative;z-index:3;max-width:620px;margin:0 auto;padding:6vh 0 24vh;}
+  .stop{
+    margin:14vh 0;opacity:0;transform:translateY(40px);
+    transition:opacity .9s ease,transform .9s ease;
+    border-left:2px solid rgba(125,249,255,.4);padding-left:1.6rem;
+    background:linear-gradient(90deg,rgba(8,30,52,.5),transparent);
+  }
+  .stop.in{opacity:1;transform:translateY(0);}
+  .stop .d{font-family:'Gowun Batang',serif;color:#7df9ff;font-size:.9rem;letter-spacing:.2em;}
+  .stop h4{font-size:1.5rem;color:#eafdff;margin:.2rem 0;letter-spacing:.03em;}
+  .stop p{font-weight:300;color:#cfeef5;line-height:1.6;}
+
+  /* CONTACT — message in a bottle */
+  #contact{min-height:100vh;padding-bottom:12vh;}
+  .bottle-wrap{position:relative;animation:float 8s ease-in-out infinite;}
+  .signal{
+    width:min(560px,86vw);padding:3rem 2.4rem;border-radius:26px;
+    background:radial-gradient(120% 140% at 50% 0%, rgba(20,60,90,.65), rgba(6,20,40,.85));
+    border:1px solid rgba(125,249,255,.4);
+    box-shadow:0 0 60px rgba(95,251,241,.25),inset 0 0 50px rgba(125,249,255,.08);
+    text-align:center;backdrop-filter:blur(8px);
+  }
+  .signal .glyph{font-size:2.4rem;margin-bottom:.8rem;filter:drop-shadow(0 0 16px rgba(125,249,255,.7));animation:titleGlow 4s ease-in-out infinite;}
+  .signal h2{font-size:clamp(1.6rem,5vw,2.6rem);color:#eafdff;margin-bottom:.5rem;}
+  .signal .lead{font-weight:300;color:#bfeaf2;margin-bottom:2rem;line-height:1.7;}
+  .signal a{display:block;color:#9b8cff;font-size:1.15rem;letter-spacing:.05em;text-decoration:none;margin:.5rem 0;
+    transition:color .3s,text-shadow .3s;font-family:'Gowun Batang',serif;}
+  .signal a:hover{color:#7df9ff;text-shadow:0 0 18px rgba(125,249,255,.8);}
+  .signal .label{font-size:.72rem;letter-spacing:.25em;color:#7fb8c6;text-transform:uppercase;}
+  footer{text-align:center;padding:3rem 0 4rem;color:#5f93a3;font-size:.78rem;letter-spacing:.18em;}
+
+  @media (max-width:640px){
+    body{cursor:auto;}
+    .cursor{display:none;}
+    .creature{width:200px;}
+  }
+</style>
+</head>
+<body>
+  <div class="ocean"></div>
+  <div class="rays"><div class="ray"></div><div class="ray"></div><div class="ray"></div><div class="ray"></div><div class="ray"></div></div>
+  <canvas id="fx"></canvas>
+  <div class="cursor" id="cursor"></div>
+
+  <!-- HERO -->
+  <section id="hero" class="center">
+    <div class="hero-inner">
+      <h1>WOO HEE JIN</h1>
+      <p class="sub">Product Designer · PM<br>아이디어를 서비스로 구체화합니다</p>
+    </div>
+    <div class="scroll-hint">더 깊이 내려가기 ↓</div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="center">
+    <h2 class="sec-head serif">심해의 생명들</h2>
+    <p class="sec-tag">Selected Projects</p>
+    <div class="creatures">
+      <!-- Jellyfish: NOTALK -->
+      <div class="creature jelly">
+        <div class="body">
+          <div class="bell"></div>
+          <div class="tentacles"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="card">
+          <h3>노톡</h3>
+          <span class="en">NOTALK</span>
+          <p>관계 부담 없는 팝업 커뮤니티. 가볍게 모이고 자연스럽게 흩어지는 연결.</p>
+          <div class="meta"><b>팀 프로젝트</b> · 진행중</div>
+        </div>
+      </div>
+
+      <!-- Anglerfish lantern: ONEULBBOK -->
+      <div class="creature angler">
+        <div class="body">
+          <div class="lantern">
+            <div class="orb-light"></div>
+            <div class="stalk"></div>
+            <div class="fish"></div>
+            <div class="eye"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>오늘뽁</h3>
+          <span class="en">ONEULBBOK</span>
+          <p>스트레스를 뽁뽁 터뜨려 날려버리는 앱. 손끝의 작은 해방감.</p>
+          <div class="meta"><b>개인 프로젝트</b> · Google Play 출시</div>
+        </div>
+      </div>
+
+      <!-- Glowing orb: KKEUSYONG -->
+      <div class="creature orb">
+        <div class="body">
+          <div class="ring"></div><div class="ring b"></div>
+          <div class="core"></div>
+        </div>
+        <div class="card">
+          <h3>끄숑</h3>
+          <span class="en">KKEUSYONG</span>
+          <p>잔소리하는 디지털 디톡스 트레이너. F/T 모드로 당신의 화면 시간을 다잡아요.</p>
+          <div class="meta"><b>팀 프로젝트</b> · 진행중</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT depth dive -->
+  <section id="about">
+    <div class="depth-readout">
+      <div class="depth-num" id="depthNum">0m</div>
+      <div class="depth-label" id="depthLabel">수면 · The Surface</div>
+    </div>
+    <div class="stops">
+      <div class="stop"><div class="d">40m</div><h4>한샘</h4><p>공간과 사용자 경험의 기본기를 익히며 디자인 여정을 시작했습니다.</p></div>
+      <div class="stop"><div class="d">80m</div><h4>집닥</h4><p>인테리어 플랫폼에서 복잡한 서비스를 사용자 관점으로 풀어냈습니다.</p></div>
+      <div class="stop"><div class="d">120m</div><h4>인터스텔라</h4><p>새로운 영역을 탐험하며 프로덕트 사고의 폭을 넓혔습니다.</p></div>
+      <div class="stop"><div class="d">160m</div><h4>미스타교자 사장</h4><p>직접 사업을 운영하며 고객·운영·숫자를 온몸으로 배웠습니다.</p></div>
+      <div class="stop"><div class="d">200m</div><h4>Now — Product Designer / PM</h4><p>경험을 모아 아이디어를 서비스로 구체화하는 일을 합니다.</p></div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="center">
+    <div class="bottle-wrap">
+      <div class="signal">
+        <div class="glyph">🜨</div>
+        <h2 class="serif">심해에서 보내는 신호</h2>
+        <p class="lead">병 속의 편지가 수면 위로 떠오르듯,<br>당신의 메시지를 기다립니다.</p>
+        <span class="label">Email</span>
+        <a href="mailto:zbxm2000@naver.com">zbxm2000@naver.com</a>
+        <span class="label" style="margin-top:1rem;display:block;">Phone</span>
+        <a href="tel:01099668132">010-9966-8132</a>
+      </div>
+    </div>
+    <footer>WOO HEE JIN · DREAM AQUARIUM · 2026</footer>
+  </section>
+
+<script>
+(function(){
+  "use strict";
+  const canvas=document.getElementById('fx');
+  const ctx=canvas.getContext('2d');
+  let W,H,dpr;
+  function resize(){
+    dpr=Math.min(window.devicePixelRatio||1,2);
+    W=canvas.width=Math.floor(innerWidth*dpr);
+    H=canvas.height=Math.floor(innerHeight*dpr);
+    canvas.style.width=innerWidth+'px';
+    canvas.style.height=innerHeight+'px';
+  }
+  resize();
+  addEventListener('resize',resize);
+
+  // ---- rising bubbles + bioluminescent specks ----
+  const bubbles=[];
+  const BUBBLE_N=46;
+  for(let i=0;i<BUBBLE_N;i++){
+    bubbles.push(makeBubble(true));
+  }
+  function makeBubble(initial){
+    return {
+      x:Math.random()*W,
+      y:initial?Math.random()*H:H+20*dpr,
+      r:(1.2+Math.random()*4)*dpr,
+      sp:(0.3+Math.random()*0.9)*dpr,
+      drift:(Math.random()-0.5)*0.5*dpr,
+      ph:Math.random()*Math.PI*2,
+      bio:Math.random()<0.28,
+      a:0.25+Math.random()*0.45
+    };
+  }
+
+  // ---- mouse follower flock (jelly sparks) ----
+  const mouse={x:innerWidth/2,y:innerHeight/2,tx:innerWidth/2,ty:innerHeight/2};
+  const cursorEl=document.getElementById('cursor');
+  const flock=[];
+  const FLOCK_N=14;
+  for(let i=0;i<FLOCK_N;i++){
+    flock.push({
+      x:mouse.x,y:mouse.y,
+      hue:i/FLOCK_N,
+      ease:0.10 - (i/FLOCK_N)*0.07,
+      size:(7 - i*0.32)
+    });
+  }
+  addEventListener('pointermove',e=>{
+    mouse.tx=e.clientX;mouse.ty=e.clientY;
+    cursorEl.style.left=e.clientX+'px';
+    cursorEl.style.top=e.clientY+'px';
+  },{passive:true});
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.globalCompositeOperation='lighter';
+
+    // bubbles
+    for(const b of bubbles){
+      b.y-=b.sp;
+      b.ph+=0.02;
+      b.x+=b.drift+Math.sin(b.ph)*0.25*dpr;
+      if(b.y< -10*dpr){Object.assign(b,makeBubble(false));}
+      ctx.beginPath();
+      if(b.bio){
+        const tw=0.5+0.5*Math.sin(b.ph*2);
+        const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r*4);
+        g.addColorStop(0,'rgba(155,140,255,'+(b.a*tw)+')');
+        g.addColorStop(1,'rgba(95,140,255,0)');
+        ctx.fillStyle=g;
+        ctx.arc(b.x,b.y,b.r*4,0,Math.PI*2);
+      }else{
+        const g=ctx.createRadialGradient(b.x-b.r*0.3,b.y-b.r*0.3,0,b.x,b.y,b.r);
+        g.addColorStop(0,'rgba(220,255,255,'+(b.a)+')');
+        g.addColorStop(0.7,'rgba(125,249,255,'+(b.a*0.5)+')');
+        g.addColorStop(1,'rgba(125,249,255,0)');
+        ctx.fillStyle=g;
+        ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+      }
+      ctx.fill();
+    }
+
+    // follower flock — leader eases to mouse, each follows previous
+    mouse.x+=(mouse.tx-mouse.x)*0.16;
+    mouse.y+=(mouse.ty-mouse.y)*0.16;
+    let px=mouse.x*dpr, py=mouse.y*dpr;
+    const t=performance.now()*0.002;
+    for(let i=0;i<flock.length;i++){
+      const f=flock[i];
+      // gentle sine wobble so the trail feels alive
+      const wob=Math.sin(t+i*0.7)*6*dpr;
+      f.x+=((px+wob)-f.x)*(f.ease+0.04);
+      f.y+=((py)-f.y)*(f.ease+0.04);
+      const rad=f.size*dpr;
+      const g=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,rad*3.2);
+      // soft teal->violet gradient along the trail
+      const r=Math.round(120+f.hue*35), gr=Math.round(220-f.hue*70), bl=255;
+      g.addColorStop(0,'rgba('+r+','+gr+','+bl+',0.55)');
+      g.addColorStop(0.4,'rgba('+(r-30)+','+(gr-40)+',255,0.22)');
+      g.addColorStop(1,'rgba(120,200,255,0)');
+      ctx.fillStyle=g;
+      ctx.beginPath();
+      ctx.arc(f.x,f.y,rad*3.2,0,Math.PI*2);
+      ctx.fill();
+      px=f.x;py=f.y;
+    }
+
+    ctx.globalCompositeOperation='source-over';
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  // ---- ABOUT depth meter ----
+  const aboutSec=document.getElementById('about');
+  const depthNum=document.getElementById('depthNum');
+  const depthLabel=document.getElementById('depthLabel');
+  const labels=[
+    [0,'수면 · The Surface'],
+    [40,'박광층 · Twilight Zone'],
+    [120,'무광층 · The Midnight'],
+    [180,'심해 · The Abyss']
+  ];
+  function onScroll(){
+    const rect=aboutSec.getBoundingClientRect();
+    const total=aboutSec.offsetHeight-innerHeight;
+    let prog=Math.min(1,Math.max(0,(-rect.top)/total));
+    if(rect.top>innerHeight||total<=0) prog=rect.top>innerHeight?0:prog;
+    const depth=Math.round(prog*200/2)*2; // 0..200 step2
+    depthNum.textContent=depth+'m';
+    let lbl=labels[0][1];
+    for(const [d,name] of labels){ if(depth>=d) lbl=name; }
+    depthLabel.textContent=lbl;
+    // color shifts cooler/darker as deeper
+    const hue=200 - prog*60; // teal -> violet
+    depthNum.style.color='hsl('+hue+',75%,'+(72-prog*20)+'%)';
+  }
+  addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+
+  // reveal stops
+  const stops=document.querySelectorAll('.stop');
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{ if(en.isIntersecting) en.target.classList.add('in'); });
+  },{threshold:0.4});
+  stops.forEach(s=>io.observe(s));
+})();
+</script>
+</body>
+</html>
