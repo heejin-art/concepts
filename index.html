@@ -3,94 +3,179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WOO HEE JIN · 컨셉 데모 5종</title>
+<title>WOO HEE JIN · 컨셉 데모 갤러리</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Noto Sans KR',sans-serif;background:#0e0e16;color:#f4f4f8;min-height:100vh;padding:64px 24px 96px;
-    background-image:radial-gradient(900px 500px at 15% 0%,rgba(120,90,255,.18),transparent 60%),radial-gradient(800px 600px at 90% 20%,rgba(0,200,220,.14),transparent 60%)}
-  .wrap{max-width:1120px;margin:0 auto}
+  body{font-family:'Noto Sans KR',sans-serif;background:#0c0c14;color:#f4f4f8;min-height:100vh;padding:60px 24px 110px;
+    background-image:radial-gradient(900px 500px at 12% -5%,rgba(120,90,255,.20),transparent 60%),radial-gradient(800px 600px at 92% 10%,rgba(0,200,220,.14),transparent 60%),radial-gradient(700px 600px at 50% 110%,rgba(255,120,180,.12),transparent 60%)}
+  .wrap{max-width:1180px;margin:0 auto}
   .kicker{font-size:13px;letter-spacing:.32em;color:#8b8ba7;text-transform:uppercase;margin-bottom:14px}
   h1{font-family:'Gowun Batang',serif;font-size:clamp(30px,5vw,52px);line-height:1.18;margin-bottom:16px}
   h1 span{background:linear-gradient(90deg,#a98bff,#5ad7ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  .lead{color:#b9b9cc;font-size:16px;line-height:1.7;max-width:640px;margin-bottom:48px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px}
-  a.card{display:block;text-decoration:none;color:inherit;border-radius:20px;padding:28px;position:relative;overflow:hidden;
+  .lead{color:#b9b9cc;font-size:16px;line-height:1.7;max-width:680px;margin-bottom:14px}
+  .note{color:#7c7c93;font-size:12.5px;line-height:1.7;max-width:680px;margin-bottom:48px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin:46px 0 22px}
+  .sec-head h2{font-family:'Jua',sans-serif;font-size:26px;letter-spacing:.01em}
+  .sec-head .cnt{font-size:13px;color:#8b8ba7}
+  .sec-head .sub{font-size:13px;color:#9a9ab2}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+  a.card{display:block;text-decoration:none;color:inherit;border-radius:20px;padding:24px;position:relative;overflow:hidden;
     border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,background .35s}
   a.card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.07)}
-  .num{font-family:'Gowun Batang',serif;font-size:14px;color:#8b8ba7;letter-spacing:.2em}
-  .swatch{height:120px;border-radius:14px;margin:16px 0 18px;position:relative;overflow:hidden}
-  .ttl{font-family:'Gowun Batang',serif;font-size:24px;margin-bottom:6px}
-  .en{font-size:12px;letter-spacing:.18em;color:#8b8ba7;text-transform:uppercase;margin-bottom:12px}
-  .desc{font-size:13.5px;color:#c2c2d4;line-height:1.65}
-  .tag{display:inline-block;margin-top:16px;font-size:12px;color:#cfcfe0;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 12px}
-  .arrow{position:absolute;top:24px;right:24px;color:#8b8ba7;font-size:20px;transition:transform .35s,color .35s}
+  .num{font-family:'Gowun Batang',serif;font-size:13px;color:#8b8ba7;letter-spacing:.2em}
+  .swatch{height:118px;border-radius:14px;margin:14px 0 16px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:52px}
+  .swatch span{filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+  .ttl{font-family:'Jua',sans-serif;font-size:22px;margin-bottom:5px}
+  .en{font-size:11.5px;letter-spacing:.16em;color:#8b8ba7;text-transform:uppercase;margin-bottom:11px}
+  .desc{font-size:13.5px;color:#c2c2d4;line-height:1.6}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+  .tag{font-size:12px;color:#cfcfe0;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 12px}
+  .tag.play{color:#0c0c14;background:#7ad7a8;border-color:transparent;font-weight:700}
+  .arrow{position:absolute;top:22px;right:22px;color:#8b8ba7;font-size:20px;transition:transform .35s,color .35s}
   a.card:hover .arrow{transform:translate(4px,-4px);color:#fff}
-  /* swatches */
-  .s-space{background:radial-gradient(120px 80px at 30% 30%,#6a5cff,transparent 70%),radial-gradient(140px 90px at 75% 65%,#1fd1d1,transparent 70%),#070712}
-  .s-space::after{content:"";position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20% 40%,#fff,transparent),radial-gradient(1px 1px at 60% 20%,#fff,transparent),radial-gradient(1px 1px at 80% 70%,#fff,transparent),radial-gradient(1px 1px at 40% 80%,#fff,transparent);opacity:.8}
-  .s-vending{background:linear-gradient(135deg,#ffd9e7,#bdf3e6 60%,#fff6d6)}
-  .s-story{background:linear-gradient(135deg,#fbe8cf,#f6d2b8 55%,#e9c3d8)}
-  .s-park{background:linear-gradient(135deg,#ffd166,#ff8fab 50%,#7ad7f0)}
-  .s-aqua{background:linear-gradient(180deg,#2bd0c4,#1668b8 60%,#06203f)}
-  .foot{margin-top:56px;color:#7c7c93;font-size:13px;line-height:1.8}
+  .flag{position:absolute;top:0;right:0;background:linear-gradient(90deg,#a98bff,#5ad7ff);color:#0c0c14;font-weight:700;font-size:11px;letter-spacing:.08em;padding:6px 14px;border-bottom-left-radius:14px}
+  a.card.hero{border-color:rgba(169,139,255,.45);background:rgba(169,139,255,.08)}
+  /* game swatches */
+  .g1{background:linear-gradient(135deg,#ffe08a,#ff9aa2 60%,#a0e7c8)}
+  .g2{background:linear-gradient(135deg,#9be7ff,#ffc3e1 60%,#bdf3e6)}
+  .g3{background:linear-gradient(135deg,#ffd3a5,#a1c4fd 70%)}
+  .g4{background:linear-gradient(135deg,#f6b25b,#ffd56b 55%,#c0392b)}
+  .g5{background:linear-gradient(135deg,#1b1b2f,#3a2a6b 60%,#5e2a8c);color:#fff}
+  .g6{background:linear-gradient(135deg,#8fd3ff,#9ee6a0 60%,#ffe07a)}
+  .g7{background:linear-gradient(135deg,#7b5cff,#28d0ff 55%,#ff7ab6)}
+  /* mood swatches */
+  .m1{background:radial-gradient(120px 80px at 30% 30%,#6a5cff,transparent 70%),radial-gradient(140px 90px at 75% 65%,#1fd1d1,transparent 70%),#070712}
+  .m2{background:linear-gradient(135deg,#ffd9e7,#bdf3e6 60%,#fff6d6)}
+  .m3{background:linear-gradient(135deg,#fbe8cf,#f6d2b8 55%,#e9c3d8)}
+  .m4{background:linear-gradient(135deg,#ffd166,#ff8fab 50%,#7ad7f0)}
+  .m5{background:linear-gradient(180deg,#2bd0c4,#1668b8 60%,#06203f)}
+  .foot{margin-top:60px;color:#7c7c93;font-size:13px;line-height:1.9;border-top:1px solid rgba(255,255,255,.08);padding-top:24px}
   .foot b{color:#c9c9dc;font-weight:500}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="kicker">WOO HEE JIN · Concept Website · Demo Gallery</div>
-  <h1>컨셉 사이트 <span>기획안 5종</span><br>데모를 직접 눌러보세요</h1>
-  <p class="lead">깔끔한 포트폴리오와 정반대 축 — 무드가 확실한 5개의 세계관입니다. 각 카드를 클릭하면 실제로 동작하는 데모가 열립니다. 마음에 드는 방향을 고르면, 그 컨셉으로 풀 사이트를 제작합니다.</p>
+  <h1>나를 표현하는 <span>컨셉 사이트</span><br>데모를 직접 플레이해보세요</h1>
+  <p class="lead">깔끔한 포트폴리오와 정반대 축 — 재미와 컨셉이 확실한 세계관들입니다. <b style="color:#dcdcec">v2는 직접 조작하는 게임형</b>, v1은 분위기형. 카드를 누르면 실제로 동작하는 데모가 열립니다.</p>
+  <p class="note">※ 게임 데모는 키보드(방향키·스페이스)로 조작합니다. 모든 캐릭터·그래픽은 직접 만든 오리지널이며, 외부 게임의 장르적 재미만 참고했습니다(저작권 이슈 없음).</p>
 
+  <div class="sec-head">
+    <h2>🎮 v2 · 게임으로 노는 소개</h2><span class="cnt">7종</span>
+    <span class="sub">조작하면서 프로젝트를 모으고 둘러보기</span>
+  </div>
+  <div class="grid">
+    <a class="card hero" href="v2/07-runner3d/"><span class="flag">NEW · 3D</span><span class="arrow">↗</span>
+      <div class="num">07</div>
+      <div class="swatch g7"><span>🏃‍♀️</span></div>
+      <div class="ttl">포트폴리오 런 (3D)</div>
+      <div class="en">Portfolio Run · Three.js</div>
+      <div class="desc">3D 도시를 달리는 엔들리스 러너. 레인을 바꿔 장애물을 피하고, 달리는 길에서 내 소개·프로젝트를 줍는다.</div>
+      <div class="meta"><span class="tag play">▶ 플레이</span><span class="tag">3D · 러너</span></div>
+    </a>
+    <a class="card" href="v2/01-cartrush/"><span class="arrow">↗</span>
+      <div class="num">01</div>
+      <div class="swatch g1"><span>🛒</span></div>
+      <div class="ttl">슈퍼마켓 카트 러시</div>
+      <div class="en">Cart Rush</div>
+      <div class="desc">방향키로 카트를 몰며 식재료를 담고 결승선 통과. 재료 하나하나가 내 프로젝트·스킬.</div>
+      <div class="meta"><span class="tag play">▶ 플레이</span><span class="tag">수집 레이스</span></div>
+    </a>
+    <a class="card" href="v2/02-bombom/"><span class="arrow">↗</span>
+      <div class="num">02</div>
+      <div class="swatch g2"><span>💧</span></div>
+      <div class="ttl">봄봄 아케이드</div>
+      <div class="en">BomBom</div>
+      <div class="desc">크레이지아케이드풍. 물풍선으로 블록을 펑! 터뜨려 숨은 소개를 찾는다. (오늘뽁 뽁뽁이 감성)</div>
+      <div class="meta"><span class="tag play">▶ 플레이</span><span class="tag">격자 폭탄</span></div>
+    </a>
+    <a class="card" href="v2/03-drive/"><span class="arrow">↗</span>
+      <div class="num">03</div>
+      <div class="swatch g3"><span>🚗</span></div>
+      <div class="ttl">붕붕이 드라이브</div>
+      <div class="en">Road Trip</div>
+      <div class="desc">붕붕이를 운전해 커리어 길을 달린다. 정류장마다 멈춰 내 여정과 프로젝트를 본다.</div>
+      <div class="meta"><span class="tag play">▶ 플레이</span><span class="tag">운전</span></div>
+    </a>
+    <a class="card" href="v2/04-bungeoppang/"><span class="arrow">↗</span>
+      <div class="num">04</div>
+      <div class="swatch g4"><span>🐟</span></div>
+      <div class="ttl">붕어빵 메이커</div>
+      <div class="en">Bungeoppang</div>
+      <div class="desc">반죽 붓고 뒤집고 속 채우기. 완성된 붕어빵의 맛(팥·슈크림·초코)이 내 프로젝트.</div>
+      <div class="meta"><span class="tag play">▶ 플레이</span><span class="tag">요리</span></div>
+    </a>
+    <a class="card" href="v2/05-lunchbox/"><span class="arrow">↗</span>
+      <div class="num">05</div>
+      <div class="swatch g5"><span>🍱</span></div>
+      <div class="ttl">도시락 까먹기</div>
+      <div class="en">Lunchbox · 8-bit</div>
+      <div class="desc">8비트 레트로. 반찬을 하나씩 까먹으면 RPG 대사창으로 소개가 뜬다. 고전게임 감성.</div>
+      <div class="meta"><span class="tag play">▶ 플레이</span><span class="tag">레트로</span></div>
+    </a>
+    <a class="card" href="v2/06-platformer/"><span class="arrow">↗</span>
+      <div class="num">06</div>
+      <div class="swatch g6"><span>⭐</span></div>
+      <div class="ttl">점프 모험</div>
+      <div class="en">Jump Quest</div>
+      <div class="desc">달리고 점프하는 플랫포머. 코인(스킬)과 별(프로젝트)을 모아 깃발까지 골인.</div>
+      <div class="meta"><span class="tag play">▶ 플레이</span><span class="tag">플랫포머</span></div>
+    </a>
+  </div>
+
+  <div class="sec-head">
+    <h2>✨ v1 · 분위기 컨셉</h2><span class="cnt">5종</span>
+    <span class="sub">스크롤·호버로 즐기는 무드 중심</span>
+  </div>
   <div class="grid">
     <a class="card" href="v1/01-space/"><span class="arrow">↗</span>
       <div class="num">01</div>
-      <div class="swatch s-space"></div>
+      <div class="swatch m1"></div>
       <div class="ttl">우주 유영</div>
       <div class="en">Cosmic Drift</div>
-      <div class="desc">딥네이비·네온의 고요한 우주. 별 패럴랙스와 로켓 커서, 스크롤하면 우주를 표류하고 프로젝트는 행성으로 다가갑니다.</div>
-      <span class="tag">몽환 · 고요</span>
+      <div class="desc">딥네이비·네온의 고요한 우주. 별 패럴랙스와 로켓 커서, 프로젝트는 행성으로 다가온다.</div>
+      <div class="meta"><span class="tag">몽환 · 고요</span></div>
     </a>
     <a class="card" href="v1/02-vending/"><span class="arrow">↗</span>
       <div class="num">02</div>
-      <div class="swatch s-vending"></div>
+      <div class="swatch m2"></div>
       <div class="ttl">레트로 자판기</div>
       <div class="en">Gacha Vending</div>
-      <div class="desc">코인 투입 → 버튼을 누르면 캡슐이 툭 떨어져 열립니다. 프로젝트는 가챠 캡슐, 스킬은 과자 진열대.</div>
-      <span class="tag">말랑 · 키치</span>
+      <div class="desc">코인 투입 → 버튼을 누르면 캡슐이 툭 떨어져 열린다. 프로젝트는 가챠 캡슐.</div>
+      <div class="meta"><span class="tag">말랑 · 키치</span></div>
     </a>
     <a class="card" href="v1/03-storybook/"><span class="arrow">↗</span>
       <div class="num">03</div>
-      <div class="swatch s-story"></div>
+      <div class="swatch m3"></div>
       <div class="ttl">팝업 동화책</div>
       <div class="en">Pop-up Storybook</div>
-      <div class="desc">수채·종이질감의 그림책. 페이지를 넘기면 종이 팝업이 일어나고, 희진의 여정이 동화로 펼쳐집니다.</div>
-      <span class="tag">따뜻 · 서사</span>
+      <div class="desc">수채·종이질감의 그림책. 페이지를 넘기면 팝업이 일어나고 여정이 동화로 펼쳐진다.</div>
+      <div class="meta"><span class="tag">따뜻 · 서사</span></div>
     </a>
     <a class="card" href="v1/04-themepark/"><span class="arrow">↗</span>
       <div class="num">04</div>
-      <div class="swatch s-park"></div>
+      <div class="swatch m4"></div>
       <div class="ttl">테마파크 맵</div>
       <div class="en">Theme Park</div>
-      <div class="desc">티켓 받고 입장하면 펼쳐지는 놀이공원. 캐릭터를 움직여 어트랙션에 탑승하면 프로젝트가 열립니다.</div>
-      <span class="tag">축제 · 활기</span>
+      <div class="desc">티켓 받고 입장하는 놀이공원. 캐릭터를 움직여 어트랙션에 탑승하면 프로젝트가 열린다.</div>
+      <div class="meta"><span class="tag">축제 · 활기</span></div>
     </a>
     <a class="card" href="v1/05-aquarium/"><span class="arrow">↗</span>
       <div class="num">05</div>
-      <div class="swatch s-aqua"></div>
+      <div class="swatch m5"></div>
       <div class="ttl">심해 아쿠아리움</div>
       <div class="en">Dream Aquarium</div>
-      <div class="desc">청록빛 심해. 마우스를 따라오는 해파리와 기포, 빛나는 심해 생물로 다가오는 프로젝트. 차분하고 몽환적.</div>
-      <span class="tag">몽환 · 차분</span>
+      <div class="desc">청록빛 심해. 마우스를 따라오는 해파리와 기포, 빛나는 심해 생물로 다가오는 프로젝트.</div>
+      <div class="meta"><span class="tag">몽환 · 차분</span></div>
     </a>
   </div>
 
   <div class="foot">
-    <b>보는 법</b> · 각 데모는 한 화면 안에서 컨셉의 핵심 인터랙션을 보여주는 프로토타입입니다 (풀 사이트 아님).<br>
-    <b>다음 단계</b> · 마음에 드는 번호를 알려주시면 그 컨셉으로 전체 페이지(About·프로젝트·Skills·Contact)를 제작해 GitHub에 푸시합니다.
+    <b>보는 법</b> · 각 데모는 컨셉의 핵심 경험을 보여주는 프로토타입입니다 (풀 사이트 아님).<br>
+    <b>다음 단계</b> · 마음에 드는 번호를 고르면 그 컨셉으로 전체 페이지(About·프로젝트·Skills·Contact)를 제작해 진짜 웹사이트로 만듭니다.
   </div>
 </div>
 </body>

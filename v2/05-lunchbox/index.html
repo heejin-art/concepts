@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>도시락 까먹기 — WOO HEE JIN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Do+Hyeon&family=Jua&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0b0f1a;
+    --ink:#f4f1e3;
+    --yellow:#ffd23f;
+    --orange:#ff7a2f;
+    --red:#ff3b54;
+    --green:#3ddc84;
+    --blue:#3aa0ff;
+    --pink:#ff6fb5;
+    --box:#1a2030;
+    --box2:#101524;
+    --line:#3a4566;
+    --rice:#fff9ec;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    background:#000;
+    color:var(--ink);
+    font-family:"Do Hyeon","Jua",sans-serif;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+    -webkit-font-smoothing:none;
+    image-rendering:pixelated;
+    touch-action:none;
+  }
+  .latin{font-family:"Press Start 2P",monospace;}
+
+  /* ===== CRT cabinet ===== */
+  #cabinet{
+    position:relative;
+    width:min(96vw, 540px);
+    aspect-ratio:3/4;
+    max-height:96vh;
+    background:
+      radial-gradient(120% 120% at 50% 0%, #16203a 0%, #0b0f1a 60%, #05070d 100%);
+    border-radius:18px;
+    border:6px solid #11151f;
+    box-shadow:
+      0 0 0 4px #000,
+      0 18px 50px rgba(0,0,0,.8),
+      inset 0 0 60px rgba(0,0,0,.7);
+    overflow:hidden;
+    image-rendering:pixelated;
+  }
+  #screen{
+    position:absolute;inset:0;
+    overflow:hidden;
+    background:var(--bg);
+  }
+
+  /* CRT overlays */
+  .scanlines{
+    pointer-events:none;position:absolute;inset:0;z-index:50;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,.22) 3px,
+      rgba(0,0,0,.22) 4px);
+    mix-blend-mode:multiply;
+  }
+  .vignette{
+    pointer-events:none;position:absolute;inset:0;z-index:51;
+    background:radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,.65) 100%);
+    border-radius:18px;
+  }
+  .flicker{
+    pointer-events:none;position:absolute;inset:0;z-index:52;
+    background:rgba(180,200,255,.04);
+    animation:flick 6s steps(2) infinite;
+  }
+  @keyframes flick{
+    0%,96%{opacity:0;}
+    97%{opacity:.5;}
+    98%{opacity:0;}
+    99%{opacity:.35;}
+    100%{opacity:0;}
+  }
+  #flash{
+    pointer-events:none;position:absolute;inset:0;z-index:53;
+    background:#fff;opacity:0;
+  }
+  #flash.on{animation:flashAnim .18s ease-out;}
+  @keyframes flashAnim{0%{opacity:.85;}100%{opacity:0;}}
+
+  /* ===== Scenes ===== */
+  .scene{position:absolute;inset:0;display:none;flex-direction:column;z-index:10;}
+  .scene.active{display:flex;}
+
+  /* ===== TITLE ===== */
+  #title{align-items:center;justify-content:center;text-align:center;gap:0;padding:18px;}
+  .crtwrap{transform:scaleY(1.0);}
+  .marquee{
+    font-family:"Press Start 2P",monospace;
+    color:var(--yellow);
+    font-size:clamp(13px,4.6vw,22px);
+    line-height:1.5;
+    text-shadow:3px 3px 0 var(--red), 0 0 14px rgba(255,210,63,.5);
+    letter-spacing:1px;
+    margin-bottom:6px;
+  }
+  .titleKo{
+    font-family:"Do Hyeon",sans-serif;
+    font-size:clamp(30px,11vw,58px);
+    color:var(--orange);
+    text-shadow:4px 4px 0 #7a1f00, 6px 6px 0 #000;
+    line-height:1.05;
+    margin:10px 0 4px;
+  }
+  .role{
+    font-family:"Press Start 2P",monospace;
+    font-size:clamp(7px,2.4vw,11px);
+    color:var(--green);
+    letter-spacing:1px;
+    margin-top:6px;
+    text-shadow:2px 2px 0 #064;
+  }
+  .pressstart{
+    font-family:"Press Start 2P",monospace;
+    color:var(--ink);
+    font-size:clamp(9px,3vw,14px);
+    margin-top:34px;
+    animation:blink 1s steps(2) infinite;
+    text-shadow:2px 2px 0 #000;
+  }
+  @keyframes blink{50%{opacity:0;}}
+  .credit{
+    position:absolute;bottom:14px;left:0;right:0;text-align:center;
+    font-family:"Press Start 2P",monospace;font-size:8px;color:#6b7aa0;
+    letter-spacing:1px;
+  }
+  .hint{
+    margin-top:14px;font-family:"Press Start 2P",monospace;font-size:7px;color:#7c89b3;line-height:1.8;
+  }
+  .pixbox{
+    image-rendering:pixelated;
+  }
+  .titleArt{margin:4px auto 0;display:block;image-rendering:pixelated;width:128px;height:auto;}
+
+  /* ===== PLAY ===== */
+  #play{padding:0;}
+  .hud{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 10px 6px;font-family:"Press Start 2P",monospace;font-size:8px;
+    color:var(--yellow);z-index:12;
+  }
+  .hud .score{color:#fff;}
+  .gaugeWrap{flex:1;margin:0 8px;}
+  .gaugeLabel{font-size:7px;color:var(--green);margin-bottom:3px;}
+  .gauge{
+    height:12px;background:#05070d;border:2px solid var(--line);
+    box-shadow:inset 0 0 0 1px #000;position:relative;overflow:hidden;
+  }
+  .gaugeFill{
+    height:100%;width:0%;
+    background:repeating-linear-gradient(90deg,var(--green) 0 6px,#28b86c 6px 8px);
+    transition:width .3s steps(8);
+  }
+  #canvasWrap{
+    flex:1;display:flex;align-items:center;justify-content:center;position:relative;
+    min-height:0;
+  }
+  #game{
+    image-rendering:pixelated;
+    width:100%;height:100%;
+    display:block;
+  }
+  .selname{
+    position:absolute;top:6px;left:50%;transform:translateX(-50%);
+    font-family:"Do Hyeon",sans-serif;font-size:clamp(13px,4.5vw,20px);
+    color:#fff;text-shadow:2px 2px 0 #000;z-index:13;
+    background:rgba(10,14,26,.7);padding:2px 12px;border:2px solid var(--line);
+  }
+  .ctrlbar{
+    display:flex;gap:6px;justify-content:center;padding:6px 8px 10px;z-index:12;
+  }
+  .pad{
+    font-family:"Press Start 2P",monospace;font-size:11px;
+    width:42px;height:36px;background:var(--box);color:var(--ink);
+    border:2px solid var(--line);border-bottom:4px solid #000;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    user-select:none;border-radius:4px;
+  }
+  .pad:active{transform:translateY(2px);border-bottom-width:2px;}
+  .pad.eat{width:auto;padding:0 14px;background:var(--red);color:#fff;border-color:#7a1226;}
+
+  /* ===== RPG dialog box ===== */
+  #dialog{
+    position:absolute;left:10px;right:10px;bottom:10px;z-index:40;
+    background:#06121f;
+    border:4px solid var(--ink);
+    box-shadow:0 0 0 4px #06121f, 0 0 0 6px #000, inset 0 0 0 2px #2a4d6e;
+    padding:14px 14px 12px;display:none;
+    border-radius:3px;
+  }
+  #dialog.show{display:block;animation:popIn .12s steps(3);}
+  @keyframes popIn{0%{transform:scale(.85);}100%{transform:scale(1);}}
+  .dlgTitle{
+    font-family:"Press Start 2P",monospace;font-size:11px;color:var(--yellow);
+    text-shadow:2px 2px 0 #000;margin-bottom:8px;display:flex;align-items:center;gap:8px;
+  }
+  .dlgEmoji{font-size:18px;}
+  .dlgBody{font-family:"Do Hyeon",sans-serif;font-size:15px;line-height:1.6;color:var(--ink);min-height:54px;}
+  .dlgBody .tag{color:var(--green);font-size:12px;}
+  .dlgBody a{color:var(--blue);text-decoration:none;}
+  .dlgNext{
+    text-align:right;font-family:"Press Start 2P",monospace;font-size:9px;color:var(--ink);
+    margin-top:8px;animation:blink 1s steps(2) infinite;
+  }
+
+  /* ===== CLEAR ===== */
+  #clear{align-items:center;justify-content:center;text-align:center;gap:8px;padding:20px;}
+  .clearTitle{
+    font-family:"Do Hyeon",sans-serif;font-size:clamp(26px,9vw,46px);color:var(--green);
+    text-shadow:4px 4px 0 #064a2b,5px 5px 0 #000;line-height:1.1;
+  }
+  .stageclear{
+    font-family:"Press Start 2P",monospace;font-size:clamp(11px,3.4vw,16px);color:var(--yellow);
+    text-shadow:2px 2px 0 var(--red);margin-top:4px;
+  }
+  .stars{font-size:clamp(26px,8vw,40px);letter-spacing:6px;margin:14px 0 6px;}
+  .recap{
+    font-family:"Do Hyeon",sans-serif;font-size:13px;line-height:1.7;color:var(--ink);
+    background:rgba(255,255,255,.04);border:2px solid var(--line);padding:10px 14px;margin:6px 0;
+    max-width:90%;
+  }
+  .recap b{color:var(--yellow);}
+  .btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center;}
+  .arcbtn{
+    font-family:"Press Start 2P",monospace;font-size:9px;color:#fff;
+    background:var(--blue);border:2px solid #16548a;border-bottom:4px solid #0a2c4d;
+    padding:10px 14px;cursor:pointer;border-radius:4px;letter-spacing:1px;
+  }
+  .arcbtn.red{background:var(--red);border-color:#7a1226;border-bottom-color:#4a0a16;}
+  .arcbtn:active{transform:translateY(2px);border-bottom-width:2px;}
+
+  /* score popup */
+  .popup{
+    position:absolute;z-index:45;font-family:"Press Start 2P",monospace;
+    font-size:12px;color:var(--yellow);text-shadow:2px 2px 0 #000,0 0 8px var(--orange);
+    pointer-events:none;animation:floatUp .9s ease-out forwards;
+  }
+  @keyframes floatUp{
+    0%{transform:translateY(0) scale(.7);opacity:0;}
+    20%{transform:translateY(-6px) scale(1.1);opacity:1;}
+    100%{transform:translateY(-46px) scale(1);opacity:0;}
+  }
+  .sound{
+    position:absolute;top:8px;right:10px;z-index:60;font-family:"Press Start 2P",monospace;
+    font-size:8px;color:#7c89b3;cursor:pointer;background:rgba(0,0,0,.4);
+    padding:4px 6px;border:1px solid var(--line);border-radius:3px;
+  }
+</style>
+</head>
+<body>
+<div id="cabinet">
+  <div id="screen">
+
+    <!-- ===== TITLE SCENE ===== -->
+    <section class="scene active" id="title">
+      <div class="crtwrap">
+        <div class="marquee latin">WOO HEE JIN</div>
+        <div class="titleKo">도시락 까먹기</div>
+        <canvas class="titleArt pixbox" id="titleArt" width="64" height="40"></canvas>
+        <div class="role latin">PRODUCT DESIGNER · PM</div>
+        <div class="pressstart latin">PRESS START &nbsp;▶</div>
+        <div class="hint latin">
+          ◀ ▶ MOVE &nbsp; / &nbsp; SPACE = EAT<br/>
+          OR TAP A 반찬
+        </div>
+      </div>
+      <div class="credit latin">© 2026 HEEJIN ARCADE — INSERT KIMCHI</div>
+    </section>
+
+    <!-- ===== PLAY SCENE ===== -->
+    <section class="scene" id="play">
+      <div class="sound" id="soundBtn">♪ ON</div>
+      <div class="hud latin">
+        <div>SCORE<br/><span class="score" id="scoreVal">000000</span></div>
+        <div class="gaugeWrap">
+          <div class="gaugeLabel latin">포만감</div>
+          <div class="gauge"><div class="gaugeFill" id="gaugeFill"></div></div>
+        </div>
+        <div style="text-align:right">반찬<br/><span class="score" id="leftVal">6</span></div>
+      </div>
+      <div id="canvasWrap">
+        <div class="selname" id="selName">계란말이</div>
+        <canvas id="game" width="160" height="160"></canvas>
+      </div>
+      <div class="ctrlbar">
+        <div class="pad" data-k="left">◀</div>
+        <div class="pad" data-k="up">▲</div>
+        <div class="pad" data-k="down">▼</div>
+        <div class="pad" data-k="right">▶</div>
+        <div class="pad eat latin" data-k="eat">먹기</div>
+      </div>
+
+      <!-- RPG dialog -->
+      <div id="dialog">
+        <div class="dlgTitle"><span class="dlgEmoji" id="dlgEmoji">🍳</span><span id="dlgTitleTxt">계란말이</span></div>
+        <div class="dlgBody" id="dlgBody"></div>
+        <div class="dlgNext latin" id="dlgNext">▼ PRESS SPACE</div>
+      </div>
+    </section>
+
+    <!-- ===== CLEAR SCENE ===== -->
+    <section class="scene" id="clear">
+      <div class="stageclear latin">STAGE CLEAR!</div>
+      <div class="clearTitle">잘 먹었습니다!</div>
+      <div class="stars" id="clearStars">★ ★ ★</div>
+      <div class="recap">
+        <b>WOO HEE JIN</b> · Product Designer · PM<br/>
+        <b>SCORE</b> <span id="finalScore">000000</span><br/>
+        한샘 → 집닥 → 인터스텔라 → 미스타교자 사장 → <b>Now</b>
+      </div>
+      <div class="recap" style="font-size:12px">
+        🍳 노톡 · 🌭 오늘뽁 · 🥬 끄숑 · 🐟 ABOUT · 🟡 SKILLS · 🍚 CONTACT
+      </div>
+      <div class="btnrow">
+        <button class="arcbtn red" id="againBtn">다시먹기</button>
+        <button class="arcbtn" id="contactBtn">CONTACT ▶</button>
+      </div>
+      <div class="hint latin" style="margin-top:14px">zbxm2000@naver.com · 010-9966-8132</div>
+    </section>
+
+  </div><!-- /screen -->
+  <div id="flash"></div>
+  <div class="scanlines"></div>
+  <div class="flicker"></div>
+  <div class="vignette"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ DATA ============ */
+  const DISHES = [
+    { id:'egg',  name:'계란말이', emoji:'🍳', color:'#ffd23f', edge:'#d99b14',
+      title:'노톡', subtitle:'관계 부담 없는 팝업 커뮤니티',
+      body:'<span class="tag">[팀 · 진행중]</span><br/>관계 부담 없는 <b>팝업 커뮤니티</b>.<br/>잠깐 떴다 사라지는 가벼운 대화.' },
+    { id:'sausage', name:'소시지', emoji:'🌭', color:'#ff6a4d', edge:'#b83a22',
+      title:'오늘뽁', subtitle:'스트레스 뽁뽁 터뜨리기 앱',
+      body:'<span class="tag">[개인 · Google Play 출시]</span><br/>스트레스를 <b>뽁뽁</b> 터뜨리는 앱.<br/>오늘 하루, 시원하게 한 방.' },
+    { id:'kimchi', name:'김치', emoji:'🥬', color:'#ff3b54', edge:'#a01023',
+      title:'끄숑', subtitle:'잔소리 디지털 디톡스 트레이너',
+      body:'<span class="tag">[팀 · F/T · 진행중]</span><br/>잔소리 없는 <b>디지털 디톡스</b> 트레이너.<br/>스스로 끄고, 숑- 비워내기.' },
+    { id:'anchovy', name:'멸치', emoji:'🐟', color:'#cfd6e6', edge:'#8a93ab',
+      title:'ABOUT — 여정', subtitle:'지나온 길',
+      body:'한샘 → 집닥 → 인터스텔라<br/>→ <b>미스타교자 사장</b><br/>→ Now <b>Product Designer · PM</b>' },
+    { id:'pickle', name:'단무지', emoji:'🟡', color:'#ffe14d', edge:'#cba80f',
+      title:'SKILLS', subtitle:'도구함',
+      body:'Figma · Next.js · TypeScript<br/>Tailwind · Supabase<br/>Claude Code · Midjourney' },
+    { id:'rice', name:'밥', emoji:'🍚', color:'#fff9ec', edge:'#cfc6b0',
+      title:'CONTACT', subtitle:'연락하기',
+      body:'📧 <a href="mailto:zbxm2000@naver.com">zbxm2000@naver.com</a><br/>📱 010-9966-8132<br/><span class="tag">밥 한 끼 어떠세요?</span>' },
+  ];
+
+  /* compartment layout on 160x160 grid.
+     Row0: egg | sausage   (top, smaller)
+     Row1: kimchi | anchovy
+     Row2: pickle | rice(big, spans extra)  */
+  // We'll define rects in canvas units (px on 160 grid).
+  const PAD=8, GAP=4;
+  // Left column dishes + right column; rice is big.
+  const cells = {
+    egg:     {x:PAD,        y:PAD,        w:68, h:44},
+    sausage: {x:PAD+68+GAP, y:PAD,        w:68, h:44},
+    kimchi:  {x:PAD,        y:PAD+44+GAP, w:68, h:44},
+    anchovy: {x:PAD+68+GAP, y:PAD+44+GAP, w:68, h:44},
+    pickle:  {x:PAD,        y:PAD+88+2*GAP,w:68, h:44},
+    rice:    {x:PAD+68+GAP, y:PAD+88+2*GAP,w:68, h:44},
+  };
+  // selection order (grid navigation)
+  const order = ['egg','sausage','kimchi','anchovy','pickle','rice'];
+
+  /* ============ STATE ============ */
+  let selIdx = 0;
+  let score = 0;
+  let eaten = {}; // id -> true
+  let eating = false;
+  let dialogOpen = false;
+  let soundOn = true;
+  const TOTAL = DISHES.length;
+  const PER = 100;
+
+  /* ============ AUDIO (8-bit) ============ */
+  let actx=null;
+  function ensureAudio(){
+    if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+    if(actx && actx.state==='suspended') actx.resume();
+  }
+  function blip(freq, dur, type){
+    if(!soundOn || !actx) return;
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.type=type||'square'; o.frequency.value=freq;
+    g.gain.value=0.06;
+    o.connect(g); g.connect(actx.destination);
+    const t=actx.currentTime;
+    g.gain.setValueAtTime(0.06,t);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.start(t); o.stop(t+dur);
+  }
+  function chomp(){ blip(180,0.05,'square'); setTimeout(()=>blip(120,0.06,'square'),55); }
+  function ding(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>blip(f,0.12,'square'),i*70)); }
+  function moveBlip(){ blip(440,0.03,'square'); }
+
+  /* ============ CANVAS ============ */
+  const cv = document.getElementById('game');
+  const ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+
+  // bite state per dish: number of bites taken (0..MAXBITE)
+  const MAXBITE = 6;
+  const bites = {}; DISHES.forEach(d=>bites[d.id]=0);
+
+  // particles
+  let parts=[];
+  function spawnParts(cx,cy,color){
+    for(let i=0;i<14;i++){
+      parts.push({
+        x:cx, y:cy,
+        vx:(Math.random()-0.5)*3.2,
+        vy:-Math.random()*3-1,
+        life:1, color: Math.random()<0.5?color:'#fff9ec',
+        size: 1+Math.floor(Math.random()*2)
+      });
+    }
+  }
+
+  // deterministic pseudo-random for pixel food texture
+  function rnd(seed){ let x=Math.sin(seed*12.9898)*43758.5453; return x-Math.floor(x); }
+
+  function px(x,y,w,h,col){ ctx.fillStyle=col; ctx.fillRect(x,y,w,h); }
+
+  function drawDish(id){
+    const c = cells[id];
+    const d = DISHES.find(x=>x.id===id);
+    const b = bites[id];
+    const done = eaten[id];
+    // compartment well
+    px(c.x-1,c.y-1,c.w+2,c.h+2,'#2a1c10'); // divider shadow
+    px(c.x,c.y,c.w,c.h, done? '#241a10' : '#3a2a18'); // inner well
+    // inner darker base
+    px(c.x+1,c.y+1,c.w-2,c.h-2,'#2c2012');
+
+    if(done){
+      // empty: a couple crumbs
+      px(c.x+8,c.y+c.h-8,2,2,d.edge);
+      px(c.x+c.w-12,c.y+10,2,2,d.edge);
+      return;
+    }
+
+    // remaining food region shrinks with bites (eat from right/bottom)
+    const eatFrac = b/MAXBITE;
+    const fx = c.x+3, fy=c.y+3;
+    const fw = (c.w-6);
+    const fh = (c.h-6);
+    // bitten amount removed from right side in chunky steps
+    const remW = Math.max(0, fw - Math.round(fw*eatFrac));
+
+    // food pixel pattern
+    const cell=4;
+    for(let yy=0; yy<fh; yy+=cell){
+      for(let xx=0; xx<remW; xx+=cell){
+        const seed = (xx*7+yy*13+id.length*31);
+        const r = rnd(seed+id.charCodeAt(0));
+        // ragged bitten edge
+        if(xx > remW-cell*1.5 && r<0.5) continue;
+        let col = d.color;
+        if(r<0.18) col = d.edge;
+        else if(r>0.86) col = lighten(d.color);
+        // dish-specific accents
+        if(id==='kimchi' && r>0.7) col='#ff6b3b';
+        if(id==='rice'){ col = r<0.5? '#fff9ec':'#efe6d0'; if(r>0.92) col='#000'; /*sesame*/ }
+        if(id==='anchovy'){ col = r<0.5? '#dfe5f0':'#aab2c6'; if(r>0.9) col='#445'; }
+        if(id==='pickle' && r>0.85) col='#fff3a8';
+        if(id==='egg'){ if(r>0.88) col='#fff4c4'; }
+        if(id==='sausage'){ if(r>0.85) col='#ff9f7a'; }
+        px(fx+xx, fy+yy, cell, cell, col);
+      }
+    }
+    // egg roll spiral lines
+    if(id==='egg' && remW>10){
+      for(let lx=fx+6; lx<fx+remW-2; lx+=10){ px(lx,fy+2,1,fh-4,'#e0a93a'); }
+    }
+    // sausage ridges
+    if(id==='sausage' && remW>10){
+      for(let lx=fx+5; lx<fx+remW-2; lx+=8){ px(lx,fy+1,1,fh-2,'#c24a2c'); }
+    }
+  }
+
+  function lighten(hex){
+    const n=parseInt(hex.slice(1),16);
+    let r=(n>>16)+30,g=((n>>8)&255)+30,b=(n&255)+30;
+    r=Math.min(255,r);g=Math.min(255,g);b=Math.min(255,b);
+    return 'rgb('+r+','+g+','+b+')';
+  }
+
+  // chopsticks cursor
+  let cursorAnim=0;
+  function drawCursor(){
+    const id = order[selIdx];
+    const c = cells[id];
+    cursorAnim += 0.15;
+    const bob = Math.round(Math.sin(cursorAnim)*2);
+    // selection bracket (blinking)
+    const blink = (Math.floor(cursorAnim*2)%2===0);
+    if(blink){
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2;
+      ctx.strokeRect(c.x-2,c.y-2,c.w+4,c.h+4);
+    }
+    // chopsticks pointing to cell center from top-right
+    const tx = c.x+c.w-12, ty=c.y-2+bob;
+    // two sticks
+    px(tx, ty-14, 2, 18, '#c98b3a');
+    px(tx+4, ty-16, 2, 20, '#b97a2e');
+    px(tx-1, ty+3, 2, 2, '#7a4a14');
+    px(tx+5, ty+4, 2, 2, '#6a3f10');
+  }
+
+  function drawBox(){
+    ctx.clearRect(0,0,160,160);
+    // table bg
+    px(0,0,160,160,'#0b0f1a');
+    // lunchbox outer (red retro tin) with bevels
+    px(3,3,154,154,'#8a1326');     // dark red border
+    px(5,5,150,150,'#c81f3a');     // red
+    px(6,6,148,148,'#e0354f');     // lighter red
+    px(6,6,148,4,'#ff647a');       // top hilite
+    px(6,150,148,4,'#7a0f1f');     // bottom shade
+    // inner tray
+    px(PAD-3,PAD-3,160-2*(PAD-3),160-2*(PAD-3),'#1c130a');
+    // dishes
+    order.forEach(drawDish);
+    // dividers gloss
+    drawCursor();
+    // particles
+    ctx.globalAlpha=1;
+    parts.forEach(p=>{ px(Math.round(p.x),Math.round(p.y),p.size,p.size,p.color); });
+  }
+
+  function updateParts(){
+    parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.25; p.life-=0.04; });
+    parts = parts.filter(p=>p.life>0 && p.y<170);
+  }
+
+  /* ============ LOOP ============ */
+  let raf=null;
+  function loop(){
+    updateParts();
+    drawBox();
+    raf=requestAnimationFrame(loop);
+  }
+
+  /* ============ TITLE ART ============ */
+  function drawTitleArt(){
+    const tc=document.getElementById('titleArt'), x=tc.getContext('2d');
+    x.imageSmoothingEnabled=false;
+    x.clearRect(0,0,64,40);
+    // little lunchbox
+    function p(a,b,w,h,c){x.fillStyle=c;x.fillRect(a,b,w,h);}
+    p(8,6,48,30,'#8a1326');
+    p(10,8,44,26,'#e0354f');
+    p(10,8,44,3,'#ff647a');
+    p(12,11,18,9,'#ffd23f');  // egg
+    p(32,11,20,9,'#ff6a4d');  // sausage
+    p(12,22,18,9,'#fff9ec');  // rice
+    p(32,22,20,9,'#3ddc84');  // veg
+    // chopsticks
+    p(46,2,2,12,'#c98b3a'); p(50,1,2,13,'#b97a2e');
+  }
+
+  /* ============ SCENE SWITCH ============ */
+  function show(idScene){
+    document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+    document.getElementById(idScene).classList.add('active');
+  }
+
+  function updateHUD(){
+    document.getElementById('scoreVal').textContent = String(score).padStart(6,'0');
+    const eatenCount = Object.keys(eaten).length;
+    document.getElementById('leftVal').textContent = (TOTAL-eatenCount);
+    const pct = Math.round(eatenCount/TOTAL*100);
+    document.getElementById('gaugeFill').style.width = pct+'%';
+    const d = DISHES.find(x=>x.id===order[selIdx]);
+    document.getElementById('selName').textContent = eaten[order[selIdx]]? '(다 먹음)' : d.name;
+  }
+
+  /* ============ FLASH ============ */
+  function flash(){
+    const f=document.getElementById('flash');
+    f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
+  }
+
+  function popup(txt){
+    const wrap=document.getElementById('canvasWrap');
+    const el=document.createElement('div');
+    el.className='popup'; el.textContent=txt;
+    const r=cv.getBoundingClientRect(), wr=wrap.getBoundingClientRect();
+    const id=order[selIdx], c=cells[id];
+    const sx = (c.x+c.w/2)/160 * r.width + (r.left-wr.left);
+    const sy = (c.y+c.h/2)/160 * r.height + (r.top-wr.top);
+    el.style.left=sx+'px'; el.style.top=sy+'px';
+    wrap.appendChild(el);
+    setTimeout(()=>el.remove(),900);
+  }
+
+  /* ============ EAT ============ */
+  function eatCurrent(){
+    if(eating || dialogOpen) return;
+    const id = order[selIdx];
+    if(eaten[id]){ // already eaten -> just open dialog again
+      openDialog(id); return;
+    }
+    ensureAudio();
+    eating=true;
+    const c=cells[id];
+    const d=DISHES.find(x=>x.id===id);
+    let step=0;
+    const total=MAXBITE;
+    const iv=setInterval(()=>{
+      step++;
+      bites[id]=step;
+      chomp();
+      // particle burst at the bite edge
+      const cx = c.x + (c.w-6)*(1-step/total) + 4;
+      const cy = c.y + c.h/2;
+      spawnParts(cx,cy,d.color);
+      flash();
+      if(step>=total){
+        clearInterval(iv);
+        eaten[id]=true;
+        score += PER;
+        updateHUD();
+        popup('냠냠 +'+PER);
+        eating=false;
+        setTimeout(()=>openDialog(id),220);
+      }
+    },70);
+  }
+
+  /* ============ DIALOG ============ */
+  function openDialog(id){
+    const d=DISHES.find(x=>x.id===id);
+    dialogOpen=true;
+    document.getElementById('dlgEmoji').textContent=d.emoji;
+    document.getElementById('dlgTitleTxt').textContent=d.title;
+    const body=document.getElementById('dlgBody');
+    body.innerHTML='';
+    document.getElementById('dialog').classList.add('show');
+    ding();
+    // typewriter
+    const full=d.body;
+    let i=0; const speed=10;
+    // strip tags for typing but keep -> do simple: reveal by characters of html (safe-ish for our content)
+    (function type(){
+      i+=2;
+      body.innerHTML = full.slice(0,i) + (i<full.length?'<span style="opacity:.4">█</span>':'');
+      if(i<full.length){ setTimeout(type,speed); }
+    })();
+  }
+  function closeDialog(){
+    document.getElementById('dialog').classList.remove('show');
+    dialogOpen=false;
+    blip(330,0.05);
+    // check clear
+    if(Object.keys(eaten).length>=TOTAL){
+      setTimeout(showClear,300);
+    } else {
+      // auto-move to next uneaten
+      moveToNextUneaten();
+    }
+  }
+  function moveToNextUneaten(){
+    for(let k=1;k<=order.length;k++){
+      const idx=(selIdx+k)%order.length;
+      if(!eaten[order[idx]]){ selIdx=idx; updateHUD(); break; }
+    }
+  }
+
+  /* ============ CLEAR ============ */
+  function showClear(){
+    const stars = score>=600? '★ ★ ★' : score>=400? '★ ★ ☆' : '★ ☆ ☆';
+    document.getElementById('clearStars').textContent=stars;
+    document.getElementById('finalScore').textContent=String(score).padStart(6,'0');
+    show('clear');
+    if(raf){cancelAnimationFrame(raf);raf=null;}
+    ding();
+  }
+
+  /* ============ NAV ============ */
+  // grid move: order is [egg,sausage / kimchi,anchovy / pickle,rice]
+  function move(dir){
+    if(dialogOpen||eating) return;
+    const col = selIdx%2, row=Math.floor(selIdx/2);
+    let nc=col, nr=row;
+    if(dir==='left') nc=col-1;
+    if(dir==='right') nc=col+1;
+    if(dir==='up') nr=row-1;
+    if(dir==='down') nr=row+1;
+    nc=(nc+2)%2; nr=(nr+3)%3;
+    selIdx=nr*2+nc;
+    moveBlip();
+    updateHUD();
+  }
+
+  /* ============ START ============ */
+  function startGame(){
+    ensureAudio();
+    score=0; eaten={}; selIdx=0; eating=false; dialogOpen=false;
+    DISHES.forEach(d=>bites[d.id]=0);
+    parts=[];
+    document.getElementById('dialog').classList.remove('show');
+    show('play');
+    updateHUD();
+    if(!raf) loop();
+    ding();
+  }
+
+  /* ============ EVENTS ============ */
+  document.getElementById('title').addEventListener('click', startGame);
+  document.getElementById('againBtn').addEventListener('click', startGame);
+  document.getElementById('contactBtn').addEventListener('click', ()=>{
+    location.href='mailto:zbxm2000@naver.com';
+  });
+  document.getElementById('soundBtn').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    soundOn=!soundOn;
+    document.getElementById('soundBtn').textContent = soundOn? '♪ ON':'♪ OFF';
+    if(soundOn) ensureAudio();
+  });
+
+  // dialog advance
+  document.getElementById('dialog').addEventListener('click', (e)=>{ e.stopPropagation(); if(dialogOpen) closeDialog(); });
+
+  // pad buttons
+  document.querySelectorAll('.pad').forEach(p=>{
+    p.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      const k=p.dataset.k;
+      if(k==='eat'){ if(dialogOpen) closeDialog(); else eatCurrent(); }
+      else move(k);
+    });
+  });
+
+  // click compartments directly
+  cv.addEventListener('click',(e)=>{
+    if(dialogOpen){ closeDialog(); return; }
+    if(eating) return;
+    const r=cv.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width*160;
+    const y=(e.clientY-r.top)/r.height*160;
+    for(let i=0;i<order.length;i++){
+      const c=cells[order[i]];
+      if(x>=c.x&&x<=c.x+c.w&&y>=c.y&&y<=c.y+c.h){
+        selIdx=i; updateHUD(); eatCurrent(); break;
+      }
+    }
+  });
+
+  // keyboard
+  window.addEventListener('keydown',(e)=>{
+    const titleActive=document.getElementById('title').classList.contains('active');
+    const clearActive=document.getElementById('clear').classList.contains('active');
+    if(titleActive){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); startGame(); }
+      return;
+    }
+    if(clearActive){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); startGame(); }
+      return;
+    }
+    // play
+    if(dialogOpen){
+      if(e.key===' '||e.key==='Enter'){ e.preventDefault(); closeDialog(); }
+      return;
+    }
+    switch(e.key){
+      case 'ArrowLeft': e.preventDefault(); move('left'); break;
+      case 'ArrowRight':e.preventDefault(); move('right');break;
+      case 'ArrowUp':   e.preventDefault(); move('up');   break;
+      case 'ArrowDown': e.preventDefault(); move('down'); break;
+      case ' ':
+      case 'Enter': e.preventDefault(); eatCurrent(); break;
+    }
+  });
+
+  /* ============ INIT ============ */
+  drawTitleArt();
+  // pre-render box once for nicer first paint
+  drawBox();
+})();
+</script>
+</body>
+</html>
