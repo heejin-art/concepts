@@ -701,9 +701,9 @@ function makeGate(key,title,sub,bg1,bg2){
 
 // ---- portfolio world scheduling (career billboards + skill flags + gates) ----
 let careerIndex = 0;     // which career billboard is next
-let nextCareerAt = 70;   // distance for next billboard
+let nextCareerAt = 45;   // distance for next billboard
 let skillIndex = 0;
-let nextSkillAt = 40;
+let nextSkillAt = 25;
 let startGateDone = false, finishGateDone = false;
 const SPAWN_AHEAD = -150; // z where new content appears
 
@@ -800,7 +800,7 @@ function startGame(){
   coins=0; distance=0; hearts=3; projGot=0; collectedProjects.length=0;
   speed=baseSpeed; curLane=1; targetX=0; velY=0; onGround=true; sliding=false; stumble=0;
   projectIndex=0; nextProjectAt=120; finished=false;
-  careerIndex=0; nextCareerAt=70; skillIndex=0; nextSkillAt=40;
+  careerIndex=0; nextCareerAt=45; skillIndex=0; nextSkillAt=25;
   startGateDone=false; finishGateDone=false;
   // clear active objects
   for(const o of activeObjs){ scene.remove(o.mesh); disposeMesh(o.mesh); }
@@ -1056,6 +1056,14 @@ function collectProject(o){
 
 // ============================================================
 init();
+
+// --- TEMP debug hook for browser verification (spawns world content near player) ---
+window.__dbg = {
+  billboard(i){ const s=CAREER[i]; const b=makeBillboard(s); b.position.set((i%2===0?-1:1)*7.2,0,-22); b.rotation.y=(i%2===0?0.32:-0.32); scene.add(b); activeObjs.push({mesh:b,type:'deco'}); },
+  flag(i){ const s=SKILLS[i%SKILLS.length]; const f=makeSkillFlag(s.n,s.c,(i%2===0?-1:1)); f.position.set((i%2===0?-1:1)*5.4,0,-18); scene.add(f); activeObjs.push({mesh:f,type:'deco'}); },
+  startgate(){ const g=makeGate('startgate','PORTFOLIO RUN','WOO HEE JIN · 우희진','#ff6f91','#ffb43d'); g.position.set(0,0,-30); scene.add(g); activeObjs.push({mesh:g,type:'deco'}); },
+  finishgate(){ const g=makeGate('finishgate','🏁 FINISH','완주! 우희진 포트폴리오','#4fd1c5','#3a9df0'); g.position.set(0,0,-30); scene.add(g); activeObjs.push({mesh:g,type:'deco'}); }
+};
 })();
 </script>
 </body>
